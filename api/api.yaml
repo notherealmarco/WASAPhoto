@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: Simplified login API specification
+  description: |-
+    This OpenAPI document describes the simplified login API.
+    Copy and paste the API from the `paths` key to your OpenAPI document.
+  version: "1"
+paths:
+  /session:
+    post:
+      tags: ["login"]
+      summary: Logs in the user
+      description: |-
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: '* imagine a Bearer token *'
+  
+  /setUsername:
+    post:
+      tags: ["login", "profile settings"]
+      summary: Changes the username
+      description: Changes the username of the user with the given one
+      operationId: setMyUsername
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '200':
+          description: Set username action successful
+
+  /followUser:
+    post:
+      tags: ["users interaction"]
+      summary: Follow a user
+      description: Starts following a user
+      operationId: followUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '200':
+          description: Follow user action successful
+        '409':
+          description: The user is already followed by the user
+  /unfollowUser:
+    post:
+      tags: ["users interaction"]
+      summary: Unfollow a user
+      description: Stops following a user
+      operationId: unfollowUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '200':
+          description: Unfollow user action successful
+        '409':
+          description: The user is not followed by the user
+  /banUser:
+    post:
+      tags: ["users interaction"]
+      summary: Ban a user
+      description: Bans a user //edit this please
+      operationId: banUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '200':
+          description: Ban user action successful
+        '409':
+          description: The user is already banned by the user
+  /unbanUser:
+    post:
+      tags: ["users interaction"]
+      summary: Unban a user
+      description: Unbans a user //edit this please
+      operationId: unbanUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
+      responses:
+        '200':
+          description: Unban user action successful
+        '409':
+          description: The user was not banned by the user
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    username:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Maria
+          pattern: 'ˆ.*?$'
+          minLength: 3
+          maxLength: 16
+
+  requestBodies:
+    userDetails:
+      description: User details
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/username"
+      required: true
