@@ -181,11 +181,9 @@ paths:
   /profile/{username}: #todo maybe username not here
     get:
       tags: ["profile"]
-      summary: Return user profile
+      summary: Returns user profile
       description: todo
       operationId: getUserProfile
-      security:
-        - BearerAuth: [] #todo maybe not needed
       parameters:
         - name: username
           in: path
@@ -237,8 +235,6 @@ paths:
       summary: Download a photo
       description: Returns the requested photo
       operationId: getUserPhoto
-      security:
-        - BearerAuth: [] #todo maybe not needed
       parameters:
         - name: username
           in: path
@@ -288,7 +284,7 @@ paths:
   /photos/{username}/{photoID}/comments:
     post:
       tags: ["comments"]
-      summary: Comment a photo #todo review
+      summary: Comments a photo #todo review
       description: aaa #todo review
       operationId: commentPhoto
       security:
@@ -351,7 +347,7 @@ paths:
   /stream: #todo parametri per lazy loading
     get:
       tags: ["stream"]
-      summary: Return user stream
+      summary: Returns user stream
       description: todo
       operationId: getMyStream
       security:
