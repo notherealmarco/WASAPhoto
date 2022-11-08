@@ -29,54 +29,71 @@ paths:
                     type: string
                     example: '* imagine a Bearer token *'
   
-  /setUsername:
-    post:
-      tags: ["login", "profile settings"]
-      summary: Changes the username
+  /session/username/{username}:
+    put:
+      tags: ["login"]
+      summary: Updates the username
       description: Changes the username of the user with the given one
       operationId: setMyUsername
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/userDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The username to update
       responses:
         '200':
-          description: Set username action successful
+          description: Update username action successful
+        '409':
+          description: The chosen username is already taken
 
-  /interactions/followUser:
+  /followers/{username}:
     post:
-      tags: ["users interaction"]
-      summary: Follow a user
+      tags: ["followers"]
+      summary: Follows a user
       description: Starts following a user
       operationId: followUser
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/userDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The user to follow
       responses:
         '200':
           description: Follow user action successful
         '409':
           description: The user is already followed by the user
-  /interactions/unfollowUser:
-    post:
-      tags: ["users interaction"]
-      summary: Unfollow a user
+    delete:
+      tags: ["followers"]
+      summary: Unfollows a user
       description: Stops following a user
       operationId: unfollowUser
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/userDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The user to unfollow
       responses:
         '200':
           description: Unfollow user action successful
         '409':
           description: The user is not followed by the user
-  /interactions/banUser:
+
+  /bans:
     post:
-      tags: ["users interaction"]
-      summary: Ban a user
+      tags: ["bans"]
+      summary: Bans a user
       description: Bans a user //edit this please
       operationId: banUser
       security:
@@ -88,59 +105,82 @@ paths:
           description: Ban user action successful
         '409':
           description: The user is already banned by the user
-  /interactions/unbanUser:
-    post:
-      tags: ["users interaction"]
-      summary: Unban a user
+  /bans/{username}:
+    delete:
+      tags: ["bans"]
+      summary: Unbans a user
       description: Unbans a user //todo edit this please
       operationId: unbanUser
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/userDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The user to unfollow
       responses:
         '200':
           description: Unban user action successful
         '409':
           description: The user was not banned by the user
 
-  /interactions/likePhoto:
+  /photos/{username}/{photoID}/likes:
     post:
-      tags: ["users interaction"]
+      tags: ["photos"]
       summary: Like a photo #todo review
       description: aaa #todo review
       operationId: likePhoto
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/photoDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The owner of the picture to like
+        - name: photoID
+          in: path
+          schema:
+            $ref: "#/components/schemas/photoID"
+          required: true
+          description: The ID of the photo to like
       responses:
         '200':
           description: Like photo action successful
         '404':
           description: The photo does not exists, or the author of the photo has banned the user
-  /interactions/unlikePhoto:
-    post:
-      tags: ["users interaction"]
+    delete:
+      tags: ["photos"]
       summary: Unlike a photo #todo review
       description: aaa #todo review
       operationId: unlikePhoto
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/photoDetails"
+      parameters:
+        - name: username
+          in: path
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The owner of the picture to unlike
+        - name: photoID
+          in: path
+          schema:
+            $ref: "#/components/schemas/photoID"
+          required: true
+          description: The ID of the photo to unlike
       responses:
         '200':
           description: Unlike photo action successful
         '404':
-          description: The photo does not exists
-        '409':
-          description: The user was not liking the photo
+          description: The photo does not exists or the user was not liking the photo
 
-
-  /photos/{username}: #todo maybe username not here
+  /profile/{username}: #todo maybe username not here
     get:
-      tags: ["photo management"]
+      tags: ["profile"]
       summary: Return user profile
       description: todo
       operationId: getUserProfile
@@ -161,19 +201,22 @@ paths:
                 type: object
                 properties:
                   followers:
-                    type: integer
-                    description: Number of users that follows the user
-                    example: 420
-                  followering:
-                    type: integer
-                    description: Number of users that the user is following
-                    example: 69
+                    type: array
+                    description: Array of users that the user is following
+                    items:
+                      $ref: "#/components/schemas/name"
+                  following:
+                    type: array
+                    description: Array of users that are following the user
+                    items:
+                      $ref: "#/components/schemas/name"
                   photos:
                     $ref: "#/components/schemas/userPhotoStream"
         '404':
           description: User not found or has banned the requesting user
+  /photos:
     post:
-      tags: ["photo management"]
+      tags: ["photos"]
       summary: Uploads a photo
       description: Uploads a photo in the gallery of the authorized user
       operationId: uploadPhoto
@@ -196,7 +239,7 @@ paths:
 
   /photos/{username}/{photoID}:
     get:
-      tags: ["photo management"]
+      tags: ["photos"]
       summary: Download a photo
       description: Returns the requested photo
       operationId: getUserPhoto
@@ -225,7 +268,7 @@ paths:
         '403':
           description: Requesting user has no permission to see the photo (banned or not following)
     delete:
-      tags: ["photo management"]
+      tags: ["photos"]
       summary: Deletes a photo
       description: Deletes a photo in the gallery of the authorized user
       operationId: deletePhoto
