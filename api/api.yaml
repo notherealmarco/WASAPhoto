@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: Simplified login API specification
+  title: WASAPhoto API
   description: |-
-    This OpenAPI document describes the simplified login API.
-    Copy and paste the API from the `paths` key to your OpenAPI document.
+    Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
+    upload your photos directly from your PC, and they will be visible to everyone following you.
   version: "1"
 paths:
   /session:
@@ -222,12 +222,6 @@ paths:
       operationId: uploadPhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: username
-          in: path
-          schema:
-            $ref: "#/components/schemas/name"
-          required: true
       requestBody:
         content:
           image/jpeg:
