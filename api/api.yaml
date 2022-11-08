@@ -29,7 +29,7 @@ paths:
                     type: string
                     example: '* imagine a Bearer token *'
   
-  /session/username/{username}:
+  /session/username:
     put:
       tags: ["login"]
       summary: Updates the username
@@ -37,13 +37,8 @@ paths:
       operationId: setMyUsername
       security:
         - BearerAuth: []
-      parameters:
-        - name: username
-          in: path
-          schema:
-            $ref: "#/components/schemas/name"
-          required: true
-          description: The username to update
+      requestBody:
+        $ref: "#/components/requestBodies/userDetails"
       responses:
         '200':
           description: Update username action successful
