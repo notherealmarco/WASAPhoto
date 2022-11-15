@@ -50,6 +50,8 @@ paths:
           description: Update username action successful.
         '409':
           description: The chosen username is already taken by another user.
+        '404':
+          description: The user does not exist.
 
   /users/{user_id}/followers/{follower_uid}:
     put:
@@ -77,6 +79,8 @@ paths:
           description: Follow user action successful.
         '403':
           description: The user has no permission perform this action.
+        '404':
+          description: The user does not exist.
     delete:
       tags: ["followers"]
       summary: Unfollows a user
@@ -101,7 +105,7 @@ paths:
         '200':
           description: Unfollow user action successful.
         '404':
-          description: The user is not followed by the user.
+          description: The user is not followed by follower_uid, or the user does not exist.
 
   /users/{user_id}/bans/{ban_uid}:
     put:
@@ -129,6 +133,8 @@ paths:
           description: Ban user action successful.
         '403':
           description: The user has no permission to perform this action.
+        '404':
+          description: The user does not exist.
 
     delete:
       tags: ["bans"]
@@ -172,7 +178,7 @@ paths:
           schema:
             $ref: "#/components/schemas/uid"
           required: true
-          description: The user ID of the owner of the photo to add a like to.
+          description: The user ID of the author of the photo to add a like to.
         - name: liker_uid
           in: path
           schema:
@@ -191,7 +197,7 @@ paths:
         '403':
           description: The user has no permission to perform this action.
         '404':
-          description: The photo does not exists, or the author of the photo has banned the user.
+          description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
     delete:
       tags: ["likes"]
       summary: Unlikes a photo
@@ -205,7 +211,7 @@ paths:
           schema:
             $ref: "#/components/schemas/uid"
           required: true
-          description: The user ID of the owner of the photo to remove a like from.
+          description: The user ID of the author of the photo to remove a like from.
         - name: liker_uid
           in: path
           schema:
@@ -222,7 +228,7 @@ paths:
         '200':
           description: Unlike photo action successful.
         '404':
-          description: The photo does not exists or the user was not liking the photo.
+          description: The user or photo does not exists, or the user is not liking the photo.
 
   /users/{user_id}:
     get:
@@ -263,6 +269,7 @@ paths:
                     $ref: "#/components/schemas/user_photo_stream"
         '404':
           description: User not found (or the authorized user is banned).
+
   /users/{user_id}/photos:
     post:
       tags: ["photos"]
@@ -286,6 +293,8 @@ paths:
       responses:
         '201':
           description: Upload photo action successful.
+        '404':
+          description: User not found (or the authorized user is banned).
 
   /users/{user_id}/photos/{photo_id}:
     get:
@@ -316,7 +325,7 @@ paths:
               schema:
                 format: binary
         '404':
-          description: Photo not found (or the user is banned by the owner of the photo).
+          description: User or photo not found (or the authorized user is banned by the author of the photo).
     delete:
       tags: ["photos"]
       summary: Deletes a photo
@@ -342,6 +351,8 @@ paths:
           description: Delete photo action successful.
         '401':
           description: The user has no permission to delete that photo.
+        '404':
+          description: User or photo not found.
 
   /users/{user_id}/photos/{photo_id}/comments:
     post:
@@ -376,7 +387,7 @@ paths:
         '200':
           description: Comment photo action successful.
         '404':
-          description: The photo does not exists (or the author of the photo has banned the user).
+          description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
 
   /users/{user_id}/photos/{photo_id}/comments/{comment_id}:
     delete:
