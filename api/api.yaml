@@ -4,7 +4,7 @@ info:
   description: |-
     Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
     upload your photos directly from your PC, and they will be visible to everyone following you.
-  version: "1"
+  version: "2.0.0"
 paths:
   /session:
     post:
@@ -19,21 +19,20 @@ paths:
         $ref: "#/components/requestBodies/userDetails"
       responses:
         '201':
-          description: User log-in action successful
+          description: User log-in action successful.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  identifier:
-                    type: string
-                    example: '* imagine a Bearer token *'
+                  user_id: #todo parameter name
+                    $ref: "#/components/schemas/uid"
   
-  /session/username:
+  /users/{user_id}/username:
     put:
-      tags: ["login"]
+      tags: ["username"]
       summary: Updates the username
-      description: Changes the username of the user with the given one
+      description: Changes the username of the user with the given one.
       operationId: setMyUsername
       security:
         - BearerAuth: []
@@ -41,12 +40,12 @@ paths:
         $ref: "#/components/requestBodies/userDetails"
       responses:
         '200':
-          description: Update username action successful
+          description: Update username action successful.
         '409':
-          description: The chosen username is already taken
+          description: The chosen username is already taken by another user.
 
-  /followers/{username}:
-    post:
+  /users/{user_id}/followers/{follower_uid}:
+    put:
       tags: ["followers"]
       summary: Follows a user
       description: Starts following a user
@@ -54,17 +53,23 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The user to follow
+          description: The user ID of the user to follow.
+        - name: follower_uid
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The new follower's user ID.
       responses:
         '200':
-          description: Follow user action successful
-        '409':
-          description: The user is already followed by the user
+          description: Follow user action successful.
+        '403':
+          description: The user has no permission perform this action.
     delete:
       tags: ["followers"]
       summary: Unfollows a user
@@ -73,148 +78,199 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The user to unfollow
+          description: The user ID of the user to remove a follower from.
+        - name: follower_uid
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the follower to remove.
       responses:
         '200':
-          description: Unfollow user action successful
-        '409':
-          description: The user is not followed by the user
+          description: Unfollow user action successful.
+        '404':
+          description: The user is not followed by the user.
 
-  /bans:
-    post:
+  /users/{user_id}/bans/{ban_uid}:
+    put:
       tags: ["bans"]
       summary: Bans a user
-      description: Bans a user //edit this please
+      description: Add a user to the list of banned users of the user.
       operationId: banUser
       security:
         - BearerAuth: []
-      requestBody:
-        $ref: "#/components/requestBodies/userDetails"
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the banning user.
+        - name: ban_uid
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user to ban.
       responses:
         '200':
-          description: Ban user action successful
-        '409':
-          description: The user is already banned by the user
-  /bans/{username}:
+          description: Ban user action successful.
+        '403':
+          description: The user has no permission to perform this action.
+
     delete:
       tags: ["bans"]
       summary: Unbans a user
-      description: Unbans a user //todo edit this please
+      description: Removes a ban from the list of banned users of the user.
       operationId: unbanUser
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The user to unfollow
+          description: The user ID of the unbanning user.
+        - name: ban_uid
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user to unban.
       responses:
         '200':
-          description: Unban user action successful
-        '409':
-          description: The user was not banned by the user
+          description: Unban user action successful.
+        '403':
+          description: The user has no permission to perform this action.
+        '404':
+          description: The user is not banned by the user.
 
-  /photos/{username}/{photoID}/likes:
-    post:
-      tags: ["photos"]
-      summary: Like a photo #todo review
-      description: aaa #todo review
+  /users/{user_id}/photos/{photo_id}/likes/{liker_uid}:
+    put:
+      tags: ["likes"]
+      summary: likes a Photo
+      description: Adds a like to a photo.
       operationId: likePhoto
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The owner of the picture to like
-        - name: photoID
+          description: The user ID of the owner of the photo to add a like to.
+        - name: liker_uid
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The ID of the photo to like
+          description: The user ID of the user who likes the photo.
+        - name: photo_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/photo_id"
+          required: true
+          description: The ID of the photo to like.
       responses:
         '200':
-          description: Like photo action successful
+          description: Like photo action successful.
+        '403':
+          description: The user has no permission to perform this action.
         '404':
-          description: The photo does not exists, or the author of the photo has banned the user
+          description: The photo does not exists, or the author of the photo has banned the user.
     delete:
-      tags: ["photos"]
-      summary: Unlike a photo #todo review
-      description: aaa #todo review
+      tags: ["likes"]
+      summary: Unlikes a photo
+      description: Removes a like from a photo
       operationId: unlikePhoto
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The owner of the picture to unlike
-        - name: photoID
+          description: The user ID of the owner of the photo to remove a like from.
+        - name: liker_uid
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/uid"
           required: true
-          description: The ID of the photo to unlike
+          description: The user ID of the user that was liking the photo.
+        - name: photo_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/photo_id"
+          required: true
+          description: The ID of the photo to remove a like from.
       responses:
         '200':
-          description: Unlike photo action successful
+          description: Unlike photo action successful.
         '404':
-          description: The photo does not exists or the user was not liking the photo
+          description: The photo does not exists or the user was not liking the photo.
 
-  /profile/{username}: #todo maybe username not here
+  /users/{user_id}:
     get:
       tags: ["profile"]
       summary: Returns user profile
-      description: todo
+      description: Returns the profile of a user, including user's photos, followers, and following users.
       operationId: getUserProfile
+      security:
+        - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
+          description: The user ID of the user to get the profile of.
           required: true
       responses:
         '200':
-          description: Returns the profile details of the given user
+          description: Returns the profile details of the given user.
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  username:
+                    $ref: "#/components/schemas/name"
                   followers:
                     type: array
-                    description: Array of users that the user is following
+                    description: Array of users that the user is following.
                     items:
-                      $ref: "#/components/schemas/name"
+                      $ref: "#/components/schemas/uid_name"
                   following:
                     type: array
-                    description: Array of users that are following the user
+                    description: Array of users that are following the user.
                     items:
-                      $ref: "#/components/schemas/name"
+                      $ref: "#/components/schemas/uid_name"
                   photos:
-                    $ref: "#/components/schemas/userPhotoStream"
+                    $ref: "#/components/schemas/user_photo_stream"
         '404':
-          description: User not found or has banned the requesting user
-  /photos:
+          description: User not found (or the authorized user is banned).
+  /users/{user_id}/photos:
     post:
       tags: ["photos"]
       summary: Uploads a photo
-      description: Uploads a photo in the gallery of the authorized user
+      description: Uploads a photo in the gallery of the authorized user.
       operationId: uploadPhoto
       security:
         - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user who uploads the photo.
       requestBody:
         content:
           image/jpeg:
@@ -222,81 +278,85 @@ paths:
               format: binary
       responses:
         '201':
-          description: Upload photo action successful #todo maybe get id?
+          description: Upload photo action successful.
 
-  /photos/{username}/{photoID}:
+  /users/{user_id}/photos/{photo_id}:
     get:
       tags: ["photos"]
-      summary: Download a photo
-      description: Returns the requested photo
+      summary: Downloads a photo
+      description: Returns the requested photo in binary format.
       operationId: getUserPhoto
+      security:
+        - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
+          description: The user ID of the user who owns the photo.
           required: true
-        - name: photoID
+        - name: photo_id
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/photo_id"
+          description: The ID of the photo to download.
           required: true
       responses:
         '200':
-          description: Returns the profile details of the given user
+          description: The requested photo in binary format.
           content:
             image/jpeg:
               schema:
                 format: binary
         '404':
-          description: Photo not found
-        '403':
-          description: Requesting user has no permission to see the photo (banned or not following)
+          description: Photo not found (or the user is banned by the owner of the photo).
     delete:
       tags: ["photos"]
       summary: Deletes a photo
-      description: Deletes a photo in the gallery of the authorized user
+      description: Deletes a photo in the gallery of the authorized user.
       operationId: deletePhoto
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
+          description: The user ID of the user who deletes the photo.
           required: true
-        - name: photoID
+        - name: photo_id
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/photo_id"
+          description: The ID of the photo to delete.
           required: true
       responses:
         '200':
-          description: Delete photo action successful
+          description: Delete photo action successful.
         '401':
-          description: The user does not own the photo
+          description: The user has no permission to delete that photo.
 
-  /photos/{username}/{photoID}/comments:
+  /users/{user_id}/photos/{photo_id}/comments:
     post:
       tags: ["comments"]
-      summary: Comments a photo #todo review
-      description: aaa #todo review
+      summary: Comments a photo
+      description: Adds a comment to a photo.
       operationId: commentPhoto
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-        - name: photoID
+        - name: photo_id
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/photo_id"
           required: true
       requestBody:
-        description: User details
+        description: The comment to post.
         content:
           application/json:
             schema:
@@ -307,122 +367,138 @@ paths:
                   example: "What a lovely picture! 😊"
       responses:
         '200':
-          description: Comment photo action successful
+          description: Comment photo action successful.
         '404':
-          description: The photo does not exists, or the author of the photo has banned the user
+          description: The photo does not exists (or the author of the photo has banned the user).
 
-  /photos/{username}/{photoID}/comments/{commentID}:
+  /users/{user_id}/photos/{photo_id}/comments/{comment_id}:
     delete:
       tags: ["comments"]
       summary: Deletes a comment
-      description: Deletes a photo in the gallery of the authorized user
+      description: Deletes a photo in the gallery of the authorized user.
       operationId: deleteComment
       security:
         - BearerAuth: []
       parameters:
-        - name: username
+        - name: user_id
           in: path
           schema:
-            $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/uid"
           required: true
-        - name: photoID
+        - name: photo_id
           in: path
           schema:
-            $ref: "#/components/schemas/photoID"
+            $ref: "#/components/schemas/photo_id"
           required: true
-        - name: commentID
+        - name: comment_id
           in: path
           schema:
-            $ref: "#/components/schemas/commentID"
+            $ref: "#/components/schemas/comment_id"
           required: true
       responses:
         '200':
-          description: Delete photo action successful
-          
-  /stream: #todo parametri per lazy loading
+          description: Delete comment action successful.
+        '401':
+          description: The user has no permission to delete that comment.
+        '404':
+          description: The comment does not exists.
+
+  /stream: #todo path
     get:
       tags: ["stream"]
       summary: Returns user stream
-      description: todo
+      description: Returns the photo stream of the authorized user.
       operationId: getMyStream
       security:
-        - BearerAuth: [] #todo maybe not needed
+        - BearerAuth: []
       parameters:
           - name: limit
             in: query
             schema:
               type: integer
               default: 25
-            description: The number of elements to show
+            description: The number of elements to show.
             required: false
           - name: startIndex
             in: query
             schema:
               type: integer
               default: 0
-            description: The starting offset
+            description: The starting offset.
             required: false
       responses:
         '200':
-          description: Returns the profile details of the given user
+          description: The photo stream.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/photoStream"
+                $ref: "#/components/schemas/photo_stream"
 
 
 components:
-
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
 
   schemas:
+    uid_name:
+      type: object
+      properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
+        name:
+          $ref: "#/components/schemas/name"
+    uid:
+      type: string
+      format: uuid
+      example: "1b4e28ba-2fa1-11d2-883f-0016d3cca427"
     name:
       type: string
       example: Maria
       pattern: 'ˆ.*?$'
       minLength: 3
       maxLength: 16
-    photoID:
+    photo_id:
       type: integer
-      description: The ID of the photo
+      description: The ID of the photo.
       example: 1527
-    commentID:
+    comment_id:
       type: integer
-      description: The ID of the comment
+      description: The ID of the comment.
       example: 3
-    uploadTime:
+    upload_time:
       type: string
       format: date-time
-      description: Photo upload time and date
+      description: Photo upload time and date.
     likes:
       type: integer
       example: 90
-      description: Number of likes
-    userPhotoStream:
+      description: Number of likes.
+    user_photo_stream:
       type: array
       items:
         type: object
         properties:
-          photoID:
-            $ref: "#/components/schemas/photoID"
-          uploadTime:
-            $ref: "#/components/schemas/uploadTime"
+          photo_id:
+            $ref: "#/components/schemas/photo_id"
+          upload_time:
+            $ref: "#/components/schemas/upload_time"
           likes:
             $ref: "#/components/schemas/likes"
-    photoStream:
+    photo_stream:
       type: array
       items:
         type: object
         properties:
+          user_id:
+            $ref: "#/components/schemas/uid"
           username:
             $ref: "#/components/schemas/name"
-          photoID:
-            $ref: "#/components/schemas/photoID"
-          uploadTime:
-            $ref: "#/components/schemas/uploadTime"
+          photo_id:
+            $ref: "#/components/schemas/photo_id"
+          upload_time:
+            $ref: "#/components/schemas/upload_time"
           likes:
             $ref: "#/components/schemas/likes"
 
@@ -436,17 +512,4 @@ components:
             properties:
               name:
                 $ref: "#/components/schemas/name"
-      required: true
-
-    photoDetails:
-      description: Photo details
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              username:
-                $ref: "#/components/schemas/name"
-              photo:
-                $ref: "#/components/schemas/photoID"
       required: true
