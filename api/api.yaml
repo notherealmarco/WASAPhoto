@@ -34,6 +34,13 @@ paths:
       summary: Updates the username
       description: Changes the username of the user with the given one.
       operationId: setMyUsername
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user to change the username to.
       security:
         - BearerAuth: []
       requestBody:
