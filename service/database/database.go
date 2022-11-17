@@ -55,11 +55,78 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
+	// Check if tables exist. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName) //todo: check for all the tables
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
+		sqlStmt := `CREATE TABLE "users" (
+			"uid"	TEXT NOT NULL,
+			"name"	TEXT NOT NULL UNIQUE,
+			PRIMARY KEY("uid")
+		)` //todo: one query is enough! Why do I need to do this?
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `CREATE TABLE "follows" (
+			"follower"	TEXT NOT NULL,
+			"followed"	TEXT NOT NULL,
+			FOREIGN KEY("follower") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			FOREIGN KEY("followed") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			PRIMARY KEY("follower","followed")
+		)`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `CREATE TABLE "bans" (
+			"user"	TEXT NOT NULL,
+			"ban"	TEXT NOT NULL,
+			FOREIGN KEY("user") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			FOREIGN KEY("ban") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			PRIMARY KEY("user","ban")
+		)`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `CREATE TABLE "photos" (
+			"user"	TEXT NOT NULL,
+			"id"	INTEGER NOT NULL,
+			"date"	TEXT NOT NULL,
+			FOREIGN KEY("user") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			PRIMARY KEY("id" AUTOINCREMENT)
+		)`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `CREATE TABLE "comments" (
+			"user"	TEXT NOT NULL,
+			"photo"	INTEGER NOT NULL,
+			"id"	INTEGER NOT NULL,
+			"comment"	TEXT NOT NULL,
+			"date"	TEXT NOT NULL,
+			FOREIGN KEY("user") REFERENCES "users"("uid"),
+			PRIMARY KEY("id" AUTOINCREMENT),
+			FOREIGN KEY("photo") REFERENCES "photos"("id")
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `CREATE TABLE "likes" (
+			"user"	TEXT NOT NULL,
+			"photo_id"	INTEGER NOT NULL,
+			FOREIGN KEY("user") REFERENCES "users"("uid") ON UPDATE CASCADE,
+			FOREIGN KEY("photo_id") REFERENCES "photos"("id") ON UPDATE CASCADE,
+			PRIMARY KEY("user","photo_id")
+		)`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+		sqlStmt = `PRAGMA foreign_keys = ON`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)

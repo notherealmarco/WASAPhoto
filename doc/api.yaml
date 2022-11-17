@@ -256,15 +256,9 @@ paths:
                   username:
                     $ref: "#/components/schemas/name"
                   followers:
-                    type: array
-                    description: Array of users that the user is following.
-                    items:
-                      $ref: "#/components/schemas/uid_name"
+                    $ref: "#/components/schemas/followers_n"
                   following:
-                    type: array
-                    description: Array of users that are following the user.
-                    items:
-                      $ref: "#/components/schemas/uid_name"
+                    $ref: "#/components/schemas/following_n"
                   photos:
                     $ref: "#/components/schemas/user_photo_stream"
         '404':
