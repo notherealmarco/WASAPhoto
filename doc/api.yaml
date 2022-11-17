@@ -53,6 +53,59 @@ paths:
         '404':
           description: The user does not exist.
 
+  /users/{user_id}/followers:
+    get:
+      tags: ["followers"]
+      summary: Gets user's followers
+      description: Get the followers list of the user
+      operationId: getUserFollowers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user to follow.
+      responses:
+        '200':
+          description: Returns the user list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/uid_name"
+        '404':
+          description: The user does not exist.
+  /users/{user_id}/following:
+    get:
+      tags: ["followers"]
+      summary: Gets following users
+      description: Get the users that a user is following
+      operationId: getUserFollowing
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The user ID of the user to follow.
+      responses:
+        '200':
+          description: Returns the user list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/uid_name"
+        '404':
+          description: The user does not exist.
+
   /users/{user_id}/followers/{follower_uid}:
     put:
       tags: ["followers"]
@@ -164,6 +217,40 @@ paths:
         '404':
           description: The user is not banned by the user.
 
+  /users/{user_id}/photos/{photo_id}/likes:
+    get:
+      tags: ["likes"]
+      summary: Gets photo likes
+      description: Get the list of users liking a photo
+      operationId: getPhotoLikes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The ID of the author of the photo.
+        - name: photo_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/photo_id"
+          required: true
+          description: The ID of the photo.
+      responses:
+        '200':
+          description: Returns the user list
+          content:
+            application/json:
+              schema:
+                type: array
+                description: An array of users liking the photo.
+                items:
+                  $ref: "#/components/schemas/uid_name"
+        '404':
+          description: The user or the photo does not exist.
+
   /users/{user_id}/photos/{photo_id}/likes/{liker_uid}:
     put:
       tags: ["likes"]
@@ -256,15 +343,9 @@ paths:
                   username:
                     $ref: "#/components/schemas/name"
                   followers:
-                    type: array
-                    description: Array of users that the user is following.
-                    items:
-                      $ref: "#/components/schemas/uid_name"
+                    $ref: "#/components/schemas/followers_n"
                   following:
-                    type: array
-                    description: Array of users that are following the user.
-                    items:
-                      $ref: "#/components/schemas/uid_name"
+                    $ref: "#/components/schemas/following_n"
                   photos:
                     $ref: "#/components/schemas/user_photo_stream"
         '404':
@@ -355,6 +436,47 @@ paths:
           description: User or photo not found.
 
   /users/{user_id}/photos/{photo_id}/comments:
+    get:
+      tags: ["comments"]
+      summary: Gets photo comments
+      description: Gets the list of comments of a photo
+      operationId: getPhotoComments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/uid"
+          required: true
+          description: The ID of the author of the photo.
+        - name: photo_id
+          in: path
+          schema:
+            $ref: "#/components/schemas/photo_id"
+          required: true
+          description: The ID of the photo.
+      responses:
+        '200':
+          description: Returns the comments list
+          content:
+            application/json:
+              schema:
+                type: array
+                description: An array of comments.
+                items:
+                  type: object
+                  properties:
+                    user_id:
+                      $ref: "#/components/schemas/uid"
+                    name:
+                      $ref: "#/components/schemas/name"
+                    comment:
+                      $ref: "#/components/schemas/comment"
+                    date:
+                      $ref: "#/components/schemas/upload_time"
+        '404':
+          description: The user or the photo does not exist.
     post:
       tags: ["comments"]
       summary: Comments a photo
@@ -381,8 +503,7 @@ paths:
               type: object
               properties:
                 comment:
-                  type: string
-                  example: "What a lovely picture! 😊"
+                  $ref: "#/components/schemas/comment"
       responses:
         '200':
           description: Comment photo action successful.
@@ -488,11 +609,19 @@ components:
     upload_time:
       type: string
       format: date-time
-      description: Photo upload time and date.
+      description: Upload time and date.
     likes:
       type: integer
       example: 90
       description: Number of likes.
+    followers_n:
+      type: integer
+      example: 420
+      description: Number of followers.
+    following_n:
+      type: integer
+      example: 69
+      description: Number of following users.
     user_photo_stream:
       type: array
       items:
@@ -519,6 +648,10 @@ components:
             $ref: "#/components/schemas/upload_time"
           likes:
             $ref: "#/components/schemas/likes"
+    comment:
+      type: string
+      example: "What a lovely picture! 😊"
+      description: The comment's text
 
   requestBodies:
     userDetails:
