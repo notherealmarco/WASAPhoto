@@ -129,7 +129,7 @@ paths:
   /photos/{username}/{photoID}/likes:
     post:
       tags: ["photos"]
-      summary: Like a photo #todo review
+      summary: Likes a photo #todo review
       description: aaa #todo review
       operationId: likePhoto
       security:
@@ -232,7 +232,7 @@ paths:
   /photos/{username}/{photoID}:
     get:
       tags: ["photos"]
-      summary: Download a photo
+      summary: Downloads a photo
       description: Returns the requested photo
       operationId: getUserPhoto
       parameters:
