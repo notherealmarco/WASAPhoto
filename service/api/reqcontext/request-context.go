@@ -15,9 +15,10 @@ import (
 type AuthStatus int
 
 const (
-	AUTHORIZED   = 0
-	UNAUTHORIZED = 1
-	FORBIDDEN    = 2
+	AUTHORIZED     = 0
+	UNAUTHORIZED   = 1
+	FORBIDDEN      = 2
+	USER_NOT_FOUND = 3
 )
 
 // RequestContext is the context of the request, for request-dependent parameters

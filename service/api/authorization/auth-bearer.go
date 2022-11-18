@@ -33,17 +33,32 @@ func (b *BearerAuth) GetToken() string {
 	return b.token
 }
 
-func (b *BearerAuth) Authorized(db database.AppDatabase) (bool, error) {
+func (b *BearerAuth) Authorized(db database.AppDatabase) (reqcontext.AuthStatus, error) {
 	// this is the way we manage authorization, the bearer token is the user id
 	state, err := db.UserExists(b.token)
 
 	if err != nil {
-		return false, err
+		return reqcontext.UNAUTHORIZED, err
 	}
-	return state, nil
+
+	if state {
+		return reqcontext.AUTHORIZED, nil
+	}
+	return reqcontext.UNAUTHORIZED, nil
 }
 
 func (b *BearerAuth) UserAuthorized(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error) {
+
+	// If uid is not a valid user, return USER_NOT_FOUND
+	user_exists, err := db.UserExists(uid)
+
+	if err != nil {
+		return reqcontext.UNAUTHORIZED, err
+	}
+	if !user_exists {
+		return reqcontext.USER_NOT_FOUND, nil
+	}
+
 	if b.token == uid {
 		auth, err := b.Authorized(db)
 
@@ -51,11 +66,7 @@ func (b *BearerAuth) UserAuthorized(db database.AppDatabase, uid string) (reqcon
 			return -1, err
 		}
 
-		if auth {
-			return reqcontext.AUTHORIZED, nil
-		} else {
-			return reqcontext.UNAUTHORIZED, nil
-		}
+		return auth, nil
 	}
 	return reqcontext.FORBIDDEN, nil
 }

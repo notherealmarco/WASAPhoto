@@ -11,6 +11,8 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.PUT("/users/:user_id/username", rt.wrap(rt.UpdateUsername))
 
+	rt.router.GET("/users/:user_id/followers", rt.wrap(rt.GetFollowers))
+
 	rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))
 
