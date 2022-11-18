@@ -46,7 +46,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/userDetails"
       responses:
-        '200':
+        '204':
           description: Update username action successful.
         '409':
           description: The chosen username is already taken by another user.
@@ -128,7 +128,7 @@ paths:
           required: true
           description: The new follower's user ID.
       responses:
-        '200':
+        '204':
           description: Follow user action successful.
         '403':
           description: The user has no permission perform this action.
@@ -155,7 +155,7 @@ paths:
           required: true
           description: The user ID of the follower to remove.
       responses:
-        '200':
+        '204':
           description: Unfollow user action successful.
         '404':
           description: The user is not followed by follower_uid, or the user does not exist.
@@ -182,7 +182,7 @@ paths:
           required: true
           description: The user ID of the user to ban.
       responses:
-        '200':
+        '204':
           description: Ban user action successful.
         '403':
           description: The user has no permission to perform this action.
@@ -210,7 +210,7 @@ paths:
           required: true
           description: The user ID of the user to unban.
       responses:
-        '200':
+        '204':
           description: Unban user action successful.
         '403':
           description: The user has no permission to perform this action.
@@ -279,7 +279,7 @@ paths:
           required: true
           description: The ID of the photo to like.
       responses:
-        '200':
+        '204':
           description: Like photo action successful.
         '403':
           description: The user has no permission to perform this action.
@@ -312,7 +312,7 @@ paths:
           required: true
           description: The ID of the photo to remove a like from.
       responses:
-        '200':
+        '204':
           description: Unlike photo action successful.
         '404':
           description: The user or photo does not exists, or the user is not liking the photo.
@@ -428,7 +428,7 @@ paths:
           description: The ID of the photo to delete.
           required: true
       responses:
-        '200':
+        '204':
           description: Delete photo action successful.
         '401':
           description: The user has no permission to delete that photo.
@@ -505,7 +505,7 @@ paths:
                 comment:
                   $ref: "#/components/schemas/comment"
       responses:
-        '200':
+        '204':
           description: Comment photo action successful.
         '404':
           description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
@@ -535,7 +535,7 @@ paths:
             $ref: "#/components/schemas/comment_id"
           required: true
       responses:
-        '200':
+        '204':
           description: Delete comment action successful.
         '401':
           description: The user has no permission to delete that comment.
