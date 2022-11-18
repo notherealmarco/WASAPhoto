@@ -1,5 +1,15 @@
 package database
 
+//Check if user exists and if exists return the user id by username
+//todo
+
+// Get user id by username
+func (db *appdbimpl) GetUserID(name string) (string, error) {
+	var uid string
+	err := db.c.QueryRow(`SELECT "uid" FROM "users" WHERE "name" = ?`, name).Scan(&uid)
+	return uid, err
+}
+
 // Create a new user
 func (db *appdbimpl) CreateUser(uid string, name string) error {
 	_, err := db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid, name)

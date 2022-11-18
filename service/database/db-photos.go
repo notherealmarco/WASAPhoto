@@ -11,8 +11,8 @@ type Photo struct {
 type UserProfile struct {
 	UID       string
 	Name      string
-	Following []string
-	Followers []string
+	Following int64
+	Followers int64
 	Photos    []Photo
 }
 
@@ -37,7 +37,42 @@ func (db *appdbimpl) GetUserProfile(uid string) (*UserProfile, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// Get followers
+	var followers int64
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM "follows" WHERE "followed" = ?`, uid).Scan(&followers)
+
+	// Get following users
+	var following int64
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM "follows" WHERE "follower" = ?`, uid).Scan(&following)
+
+	// Get photos
+	rows, err := db.c.Query(`SELECT "photos.id", "photos.date",
+								COUNT("likes.user") AS "likes",
+								COUNT("comments.user") AS "comments"
+								FROM "photos", "likes", "comments"
+								WHERE "likes.photo_id" = "photos.id"
+								AND "comments.photo" = "photos.id"
+								AND "user" = ?`, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	var photos []Photo
+	for rows.Next() {
+		var id int64
+		var date string
+		var likes int64
+		var comments int64
+		err = rows.Scan(&id, &date, &likes, &comments)
+		if err != nil {
+			return nil, err
+		}
+		photo_data := Photo{id, likes, comments}
+		photos = append(photos, photo_data)
+	}
+
+	return &UserProfile{uid, name, followers, following, photos}, nil
 }
 
 // Like a photo
