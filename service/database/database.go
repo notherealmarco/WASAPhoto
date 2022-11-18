@@ -40,7 +40,7 @@ import (
 type AppDatabase interface {
 	UserExists(uid string) (bool, error)
 	GetUserID(name string) (string, error)
-	SetName(name string) error
+	UpdateUsername(uid, name string) error
 	CreateUser(name string) (string, error)
 	FollowUser(uid string, follow string) error
 	UnfollowUser(uid string, unfollow string) error

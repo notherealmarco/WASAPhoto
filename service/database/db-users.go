@@ -11,7 +11,7 @@ import (
 // Check if user exists
 func (db *appdbimpl) UserExists(uid string) (bool, error) {
 	var name string
-	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, name).Scan(&name)
+	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, uid).Scan(&name)
 
 	if db_errors.EmptySet(err) {
 		return false, nil
@@ -36,6 +36,12 @@ func (db *appdbimpl) CreateUser(name string) (string, error) {
 	}
 	_, err = db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid.String(), name)
 	return uid.String(), err
+}
+
+// Update username
+func (db *appdbimpl) UpdateUsername(uid string, name string) error {
+	_, err := db.c.Exec(`UPDATE "users" SET "name" = ? WHERE "uid" = ?`, name, uid)
+	return err
 }
 
 // Follow a user

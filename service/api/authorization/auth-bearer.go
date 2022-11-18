@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
 	"github.com/notherealmarco/WASAPhoto/service/database"
 )
 
@@ -42,9 +43,19 @@ func (b *BearerAuth) Authorized(db database.AppDatabase) (bool, error) {
 	return state, nil
 }
 
-func (b *BearerAuth) UserAuthorized(db database.AppDatabase, uid string) (bool, error) {
+func (b *BearerAuth) UserAuthorized(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error) {
 	if b.token == uid {
-		return b.Authorized(db)
+		auth, err := b.Authorized(db)
+
+		if err != nil {
+			return -1, err
+		}
+
+		if auth {
+			return reqcontext.AUTHORIZED, nil
+		} else {
+			return reqcontext.UNAUTHORIZED, nil
+		}
 	}
-	return false, nil
+	return reqcontext.FORBIDDEN, nil
 }

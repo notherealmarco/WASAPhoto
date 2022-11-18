@@ -12,6 +12,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type AuthStatus int
+
+const (
+	AUTHORIZED   = 0
+	UNAUTHORIZED = 1
+	FORBIDDEN    = 2
+)
+
 // RequestContext is the context of the request, for request-dependent parameters
 type RequestContext struct {
 	// ReqUUID is the request unique ID
@@ -26,5 +34,5 @@ type RequestContext struct {
 type Authorization interface {
 	GetType() string
 	Authorized(db database.AppDatabase) (bool, error)
-	UserAuthorized(db database.AppDatabase, uid string) (bool, error)
+	UserAuthorized(db database.AppDatabase, uid string) (AuthStatus, error)
 }
