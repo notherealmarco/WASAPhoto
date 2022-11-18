@@ -38,9 +38,10 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
+	UserExists(uid string) (bool, error)
 	GetUserID(name string) (string, error)
 	SetName(name string) error
-	CreateUser(uid string, name string) error
+	CreateUser(name string) (string, error)
 	FollowUser(uid string, follow string) error
 	UnfollowUser(uid string, unfollow string) error
 	BanUser(uid string, ban string) error

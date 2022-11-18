@@ -1,11 +1,13 @@
 package api
 
 import (
-	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
+	"net/http"
+
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/notherealmarco/WASAPhoto/service/api/authorization"
+	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 // httpRouterHandler is the signature for functions that accepts a reqcontext.RequestContext in addition to those
@@ -21,8 +23,18 @@ func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Re
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		auth, err := authorization.BuildAuth(r.Header.Get("Authorization"))
+
+		if err != nil {
+			rt.baseLogger.WithError(err).Info("User not authorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		var ctx = reqcontext.RequestContext{
 			ReqUUID: reqUUID,
+			Auth:    auth,
 		}
 
 		// Create a request-specific logger

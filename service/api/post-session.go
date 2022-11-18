@@ -6,6 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
+	"github.com/notherealmarco/WASAPhoto/service/database/db_errors"
 )
 
 type _reqbody struct {
@@ -21,15 +22,26 @@ type _respbody struct {
 func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var request _reqbody
-	json.NewDecoder(r.Body).Decode(&request) //todo: capire se serve close
+	err := json.NewDecoder(r.Body).Decode(&request) //todo: capire se serve close
 
-	uid, err := rt.db.GetUserID(request.Name)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	var uid string
+	if err == nil { // test if user exists
+		uid, err = rt.db.GetUserID(request.Name)
+	}
+	if db_errors.EmptySet(err) { // user does not exist
+		err = nil
+		uid, err = rt.db.CreateUser(request.Name)
+	}
+	if err != nil { // handle any other error
+		w.WriteHeader(http.StatusInternalServerError) // todo: is not ok
 		return
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(_respbody{UID: uid})
+	err = json.NewEncoder(w).Encode(_respbody{UID: uid})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError) // todo: is not ok
+		return
+	}
 }

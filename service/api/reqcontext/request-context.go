@@ -8,6 +8,7 @@ package reqcontext
 
 import (
 	"github.com/gofrs/uuid"
+	"github.com/notherealmarco/WASAPhoto/service/database"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,4 +19,12 @@ type RequestContext struct {
 
 	// Logger is a custom field logger for the request
 	Logger logrus.FieldLogger
+
+	Auth Authorization
+}
+
+type Authorization interface {
+	GetType() string
+	Authorized(db database.AppDatabase) (bool, error)
+	UserAuthorized(db database.AppDatabase, uid string) (bool, error)
 }

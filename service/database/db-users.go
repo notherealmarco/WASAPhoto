@@ -1,7 +1,25 @@
 package database
 
+import (
+	"github.com/gofrs/uuid"
+	"github.com/notherealmarco/WASAPhoto/service/database/db_errors"
+)
+
 //Check if user exists and if exists return the user id by username
 //todo
+
+// Check if user exists
+func (db *appdbimpl) UserExists(uid string) (bool, error) {
+	var name string
+	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, name).Scan(&name)
+
+	if db_errors.EmptySet(err) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 // Get user id by username
 func (db *appdbimpl) GetUserID(name string) (string, error) {
@@ -11,9 +29,13 @@ func (db *appdbimpl) GetUserID(name string) (string, error) {
 }
 
 // Create a new user
-func (db *appdbimpl) CreateUser(uid string, name string) error {
-	_, err := db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid, name)
-	return err
+func (db *appdbimpl) CreateUser(name string) (string, error) {
+	uid, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	_, err = db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid.String(), name)
+	return uid.String(), err
 }
 
 // Follow a user
