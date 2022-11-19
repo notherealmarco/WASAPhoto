@@ -14,7 +14,7 @@ type _reqbody struct {
 }
 
 type _respbody struct {
-	UID string `json:"uid"`
+	UID string `json:"user_id"`
 }
 
 // getContextReply is an example of HTTP endpoint that returns "Hello World!" as a plain text. The signature of this

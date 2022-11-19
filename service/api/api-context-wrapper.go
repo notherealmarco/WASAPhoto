@@ -28,7 +28,6 @@ func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Re
 
 		if err != nil {
 			rt.baseLogger.WithError(err).Info("User not authorized")
-			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 

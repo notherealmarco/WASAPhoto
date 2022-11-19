@@ -34,14 +34,17 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	UserExists(uid string) (bool, error)
 	GetUserID(name string) (string, error)
-	SetName(name string) error
+	UpdateUsername(uid, name string) error
 	CreateUser(name string) (string, error)
+	GetUserFollowers(uid string) ([]structures.UIDName, error)
 	FollowUser(uid string, follow string) error
 	UnfollowUser(uid string, unfollow string) error
 	BanUser(uid string, ban string) error

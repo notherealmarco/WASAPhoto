@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/gofrs/uuid"
 	"github.com/notherealmarco/WASAPhoto/service/database/db_errors"
+	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
 //Check if user exists and if exists return the user id by username
@@ -11,7 +12,7 @@ import (
 // Check if user exists
 func (db *appdbimpl) UserExists(uid string) (bool, error) {
 	var name string
-	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, name).Scan(&name)
+	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, uid).Scan(&name)
 
 	if db_errors.EmptySet(err) {
 		return false, nil
@@ -36,6 +37,34 @@ func (db *appdbimpl) CreateUser(name string) (string, error) {
 	}
 	_, err = db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid.String(), name)
 	return uid.String(), err
+}
+
+// Update username
+func (db *appdbimpl) UpdateUsername(uid string, name string) error {
+	_, err := db.c.Exec(`UPDATE "users" SET "name" = ? WHERE "uid" = ?`, name, uid)
+	return err
+}
+
+// Get user followers
+func (db *appdbimpl) GetUserFollowers(uid string) ([]structures.UIDName, error) {
+	rows, err := db.c.Query(`SELECT "follower", "user.name" FROM "follows", "users"
+							WHERE "follows.follower" = "users.uid"
+							AND "followed" = ?`, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	var followers []structures.UIDName = make([]structures.UIDName, 0)
+	for rows.Next() {
+		var uid string
+		var name string
+		err = rows.Scan(&uid, &name)
+		if err != nil {
+			return nil, err
+		}
+		followers = append(followers, structures.UIDName{UID: uid, Name: name})
+	}
+	return followers, nil
 }
 
 // Follow a user
