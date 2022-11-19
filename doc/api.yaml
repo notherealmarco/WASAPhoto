@@ -5,6 +5,25 @@ info:
     Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
     upload your photos directly from your PC, and they will be visible to everyone following you.
   version: "2.0.0"
+tags:
+  - name: login
+    description: Login API
+  - name: username
+    description: Operations related to username
+  - name: followers
+    description: Operations related to followers
+  - name: likes
+    description: Operations related to likes
+  - name: bans
+    description: Operations related to bans
+  - name: profile
+    description: Operations related to user profiles
+  - name: photos
+    description: Operations related to photos
+  - name: comments
+    description: Operations related to comments
+  - name: stream
+    description: Operations related to the user stream
 paths:
   /session:
     post:
@@ -18,15 +37,14 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/userDetails"
       responses:
-        '201':
+        '200': #is 201 in the original one
           description: User log-in action successful.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  user_id: #todo parameter name
-                    $ref: "#/components/schemas/uid"
+                $ref: "#/components/schemas/uid_object"
+              example:
+                user_id: "123e4567-e89b-12d3-a456-426655440000"
   
   /users/{user_id}/username:
     put:
@@ -46,12 +64,20 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/userDetails"
       responses:
-        '200':
+        '204':
           description: Update username action successful.
         '409':
-          description: The chosen username is already taken by another user.
+          description: The chosen username is already taken by another users.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/followers:
     get:
@@ -75,10 +101,21 @@ paths:
             application/json:
               schema:
                 type: array
+                description: The list of followers.
+                minItems: 0
                 items:
                   $ref: "#/components/schemas/uid_name"
+              example:
+                - user_id: "123e4567-e89b-12d3-a456-426655440000"
+                  username: "Maria"
+                - user_id: "123e4567-e89b-12d3-a456-426655440001"
+                  username: "Filippo"
         '404':
           description: The user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
   /users/{user_id}/following:
     get:
       tags: ["followers"]
@@ -101,12 +138,36 @@ paths:
             application/json:
               schema:
                 type: array
+                minItems: 0
+                description: The list of users that the user is following.
                 items:
                   $ref: "#/components/schemas/uid_name"
+              example:
+                - user_id: "123e4567-e89b-12d3-a456-426655440000"
+                  username: "Maria"
+                - user_id: "123e4567-e89b-12d3-a456-426655440001"
+                  username: "Filippo"
         '404':
           description: The user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/followers/{follower_uid}:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The ID of the user to follow.
+      - name: follower_uid
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The follower's user ID.
     put:
       tags: ["followers"]
       summary: Follows a user
@@ -114,26 +175,21 @@ paths:
       operationId: followUser
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user to follow.
-        - name: follower_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The new follower's user ID.
       responses:
-        '200':
+        '204':
           description: Follow user action successful.
         '403':
           description: The user has no permission perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
     delete:
       tags: ["followers"]
       summary: Unfollows a user
@@ -141,26 +197,30 @@ paths:
       operationId: unfollowUser
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user to remove a follower from.
-        - name: follower_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the follower to remove.
       responses:
-        '200':
+        '204':
           description: Unfollow user action successful.
         '404':
           description: The user is not followed by follower_uid, or the user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/bans/{ban_uid}:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The user ID of the banning user.
+      - name: ban_uid
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The user ID of the banned user.
     put:
       tags: ["bans"]
       summary: Bans a user
@@ -168,26 +228,21 @@ paths:
       operationId: banUser
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the banning user.
-        - name: ban_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user to ban.
       responses:
-        '200':
+        '204':
           description: Ban user action successful.
         '403':
           description: The user has no permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
     delete:
       tags: ["bans"]
@@ -196,26 +251,21 @@ paths:
       operationId: unbanUser
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the unbanning user.
-        - name: ban_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user to unban.
       responses:
-        '200':
+        '204':
           description: Unban user action successful.
         '403':
           description: The user has no permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The user is not banned by the user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos/{photo_id}/likes:
     get:
@@ -245,13 +295,42 @@ paths:
             application/json:
               schema:
                 type: array
+                minItems: 0
                 description: An array of users liking the photo.
                 items:
                   $ref: "#/components/schemas/uid_name"
+              example:
+                - user_id: "123e4567-e89b-12d3-a456-426655440000"
+                  username: "Maria"
+                - user_id: "123e4567-e89b-12d3-a456-426655440001"
+                  username: "Filippo"
         '404':
           description: The user or the photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos/{photo_id}/likes/{liker_uid}:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The ID of the author of the photo.
+      - name: liker_uid
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The ID of the user who likes the photo.
+      - name: photo_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/photo_id"
+        required: true
+        description: The ID of the photo.
     put:
       tags: ["likes"]
       summary: likes a Photo
@@ -259,32 +338,21 @@ paths:
       operationId: likePhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the author of the photo to add a like to.
-        - name: liker_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user who likes the photo.
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          required: true
-          description: The ID of the photo to like.
       responses:
-        '200':
+        '204':
           description: Like photo action successful.
         '403':
           description: The user has no permission to perform this action.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
     delete:
       tags: ["likes"]
       summary: Unlikes a photo
@@ -292,30 +360,15 @@ paths:
       operationId: unlikePhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the author of the photo to remove a like from.
-        - name: liker_uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user that was liking the photo.
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          required: true
-          description: The ID of the photo to remove a like from.
       responses:
-        '200':
+        '204':
           description: Unlike photo action successful.
         '404':
           description: The user or photo does not exists, or the user is not liking the photo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}:
     get:
@@ -338,18 +391,24 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  username:
-                    $ref: "#/components/schemas/name"
-                  followers:
-                    $ref: "#/components/schemas/followers_n"
-                  following:
-                    $ref: "#/components/schemas/following_n"
-                  photos:
-                    $ref: "#/components/schemas/user_photo_stream"
+                $ref: "#/components/schemas/user_profile"
+              example:
+                username: "Maria"
+                followers: 25
+                following: 32
+                photos:
+                  - photo_id: 2341
+                    upload_time: "2020-11-20T12:00:00Z"
+                    likes: 2
+                  - photo_id: 2342
+                    upload_time: "2022-10-23T12:01:00Z"
+                    likes: 5
         '404':
           description: User not found (or the authorized user is banned).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos:
     post:
@@ -370,14 +429,39 @@ paths:
         content:
           image/jpeg:
             schema:
+              description: The photo to upload.
+              type: string
               format: binary
       responses:
         '201':
           description: Upload photo action successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_success"
+              example:
+                status: "Created"
         '404':
           description: User not found (or the authorized user is banned).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos/{photo_id}:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        description: The ID of the author of the photo.
+        required: true
+      - name: photo_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/photo_id"
+        description: The ID of the photo.
+        required: true
     get:
       tags: ["photos"]
       summary: Downloads a photo
@@ -385,28 +469,22 @@ paths:
       operationId: getUserPhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          description: The user ID of the user who owns the photo.
-          required: true
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          description: The ID of the photo to download.
-          required: true
       responses:
         '200':
           description: The requested photo in binary format.
           content:
             image/jpeg:
               schema:
+                #todo it wants lenght
+                description: The requested photo in binary format.
+                type: string
                 format: binary
         '404':
           description: User or photo not found (or the authorized user is banned by the author of the photo).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
     delete:
       tags: ["photos"]
       summary: Deletes a photo
@@ -414,28 +492,36 @@ paths:
       operationId: deletePhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          description: The user ID of the user who deletes the photo.
-          required: true
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          description: The ID of the photo to delete.
-          required: true
       responses:
-        '200':
+        '204':
           description: Delete photo action successful.
         '401':
           description: The user has no permission to delete that photo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: User or photo not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos/{photo_id}/comments:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The ID of the author of the photo.
+      - name: photo_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/photo_id"
+        required: true
+        description: The ID of the photo.
     get:
       tags: ["comments"]
       summary: Gets photo comments
@@ -443,40 +529,28 @@ paths:
       operationId: getPhotoComments
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The ID of the author of the photo.
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          required: true
-          description: The ID of the photo.
       responses:
         '200':
           description: Returns the comments list
           content:
             application/json:
               schema:
-                type: array
-                description: An array of comments.
-                items:
-                  type: object
-                  properties:
-                    user_id:
-                      $ref: "#/components/schemas/uid"
-                    name:
-                      $ref: "#/components/schemas/name"
-                    comment:
-                      $ref: "#/components/schemas/comment"
-                    date:
-                      $ref: "#/components/schemas/upload_time"
+                $ref: "#/components/schemas/comments"
+              example:
+                - user_id: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+                  name: "Maria"
+                  comment: "Nice photo!"
+                  date: "2020-11-20T12:00:00Z"
+                - user_id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+                  name: "John"
+                  comment: "I like it!"
+                  date: "2021-12-20T13:04:00Z"
         '404':
           description: The user or the photo does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
     post:
       tags: ["comments"]
       summary: Comments a photo
@@ -484,31 +558,23 @@ paths:
       operationId: commentPhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-        - name: photo_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/photo_id"
-          required: true
       requestBody:
         description: The comment to post.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                comment:
-                  $ref: "#/components/schemas/comment"
+              $ref: "#/components/schemas/comment_request"
+            example:
+              comment: "Lovely!"
       responses:
-        '200':
-          description: Comment photo action successful.
+        '204':
+          description: Comment photo action successful. #todo maybe 201
         '404':
           description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
   /users/{user_id}/photos/{photo_id}/comments/{comment_id}:
     delete:
@@ -521,28 +587,39 @@ paths:
       parameters:
         - name: user_id
           in: path
+          description: The ID of the author of the photo.
           schema:
             $ref: "#/components/schemas/uid"
           required: true
         - name: photo_id
+          description: The ID of the photo.
           in: path
           schema:
             $ref: "#/components/schemas/photo_id"
           required: true
         - name: comment_id
+          description: The ID of the comment to delete.
           in: path
           schema:
             $ref: "#/components/schemas/comment_id"
           required: true
       responses:
-        '200':
+        '204':
           description: Delete comment action successful.
         '401':
           description: The user has no permission to delete that comment.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
         '404':
           description: The comment does not exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_error"
 
-  /stream: #todo path
+  /stream: # todo review path
     get:
       tags: ["stream"]
       summary: Returns user stream
@@ -558,7 +635,7 @@ paths:
               default: 25
             description: The number of elements to show.
             required: false
-          - name: startIndex
+          - name: start_index
             in: query
             schema:
               type: integer
@@ -572,6 +649,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/photo_stream"
+              example:
+                - user_id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+                - username: "Federicus"
+                - photo_id: 1520
+                - upload_time: "2020-11-20T12:00:00Z"
+                - likes: 93
+
 
 
 components:
@@ -588,14 +672,30 @@ components:
           $ref: "#/components/schemas/uid"
         name:
           $ref: "#/components/schemas/name"
+    uid_object:
+      type: object
+      description: The user identifier.
+      properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
     uid:
       type: string
+      minLength: 36
+      maxLength: 36
+      description: The user ID.
       format: uuid
       example: "1b4e28ba-2fa1-11d2-883f-0016d3cca427"
+    name_object:
+      type: object
+      description: The username of the user.
+      properties:
+        name:
+          $ref: "#/components/schemas/name"
     name:
       type: string
+      description: The username of the user.
       example: Maria
-      pattern: 'ˆ.*?$'
+      pattern: '^[a-zA-Z0-9_.]*$'
       minLength: 3
       maxLength: 16
     photo_id:
@@ -622,36 +722,100 @@ components:
       type: integer
       example: 69
       description: Number of following users.
+    user_profile:
+      type: object
+      description: The profile of the user.
+      properties:
+        username:
+          $ref: "#/components/schemas/name"
+        followers:
+          $ref: "#/components/schemas/followers_n"
+        following:
+          $ref: "#/components/schemas/following_n"
+        photos:
+          $ref: "#/components/schemas/user_photo_stream"
     user_photo_stream:
       type: array
+      minItems: 0
+      description: An array of photos, upload time and likes.
       items:
-        type: object
-        properties:
-          photo_id:
-            $ref: "#/components/schemas/photo_id"
-          upload_time:
-            $ref: "#/components/schemas/upload_time"
-          likes:
-            $ref: "#/components/schemas/likes"
+        $ref: "#/components/schemas/user_photo_stream_item"
+    user_photo_stream_item:
+      type: object
+      properties:
+        photo_id:
+          $ref: "#/components/schemas/photo_id"
+        upload_time:
+          $ref: "#/components/schemas/upload_time"
+        likes:
+          $ref: "#/components/schemas/likes"
     photo_stream:
       type: array
+      minItems: 0
+      description: An array of photos, author, upload time and likes.
       items:
-        type: object
-        properties:
-          user_id:
-            $ref: "#/components/schemas/uid"
-          username:
-            $ref: "#/components/schemas/name"
-          photo_id:
-            $ref: "#/components/schemas/photo_id"
-          upload_time:
-            $ref: "#/components/schemas/upload_time"
-          likes:
-            $ref: "#/components/schemas/likes"
+        $ref: "#/components/schemas/photo_stream_item"
+    photo_stream_item:
+      type: object
+      properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
+        username:
+          $ref: "#/components/schemas/name"
+        photo_id:
+          $ref: "#/components/schemas/photo_id"
+        upload_time:
+          $ref: "#/components/schemas/upload_time"
+        likes:
+          $ref: "#/components/schemas/likes"
+    comments:
+      type: array
+      minItems: 0
+      description: An array of comments.
+      items:
+        $ref : "#/components/schemas/comment_item"
+    comment_item:
+      type: object
+      properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
+        name:
+          $ref: "#/components/schemas/name"
+        comment:
+          $ref: "#/components/schemas/comment"
+        date:
+          $ref: "#/components/schemas/upload_time"
+    comment_request:
+      description: The comment to post.
+      type: object
+      properties:
+        comment:
+          $ref: "#/components/schemas/comment"
     comment:
+      minLength: 5
+      maxLength: 100 #todo think about it
+      pattern: ".*" #everything except newlines
       type: string
       example: "What a lovely picture! 😊"
       description: The comment's text
+    
+    generic_error:
+      type: object
+      description: An object representing an error.
+      properties:
+        error:
+          type: string
+          description: The error message.
+          example: "The user does not exist."
+
+    generic_success:
+      type: object
+      description: An object representing a success.
+      properties:
+        status:
+          type: string
+          description: The status of the request.
+          example: "Created"
 
   requestBodies:
     userDetails:
@@ -659,8 +823,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              name:
-                $ref: "#/components/schemas/name"
+            $ref: "#/components/schemas/name_object"
+          example:
+            name: "Maria"
       required: true
