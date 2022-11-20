@@ -99,12 +99,12 @@ func (db *appdbimpl) GetUserProfile(uid string) (*UserProfile, error) {
 	err = db.c.QueryRow(`SELECT COUNT(*) FROM "follows" WHERE "follower" = ?`, uid).Scan(&following)
 
 	// Get photos
-	rows, err := db.c.Query(`SELECT "photos.id", "photos.date",
-								COUNT("likes.user") AS "likes",
-								COUNT("comments.user") AS "comments"
+	rows, err := db.c.Query(`SELECT "photos"."id", "photos"."date",
+								COUNT("likes"."user") AS "likes",
+								COUNT("comments"."user") AS "comments"
 								FROM "photos", "likes", "comments"
-								WHERE "likes.photo_id" = "photos.id"
-								AND "comments.photo" = "photos.id"
+								WHERE "likes"."photo_id" = "photos"."id"
+								AND "comments"."photo" = "photos"."id"
 								AND "user" = ?`, uid)
 	if err != nil {
 		return nil, err
@@ -151,9 +151,9 @@ func (db *appdbimpl) GetPhotoLikes(uid string, photo int64) (QueryResult, *[]str
 		return ERR_NOT_FOUND, nil, nil
 	}
 
-	rows, err := db.c.Query(`SELECT "users.uid", "users.name" FROM "likes", "users"
-								WHERE "likes.photo_id" = ?
-								AND "likes.user" = "users.uid"`, photo)
+	rows, err := db.c.Query(`SELECT "users"."uid", "users"."name" FROM "likes", "users"
+								WHERE "likes"."photo_id" = ?
+								AND "likes"."user" = "users"."uid"`, photo)
 	if err != nil {
 		return ERR_INTERNAL, nil, err
 	}

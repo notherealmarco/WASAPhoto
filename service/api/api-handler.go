@@ -23,8 +23,13 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:user_id/photos/:photo_id", rt.wrap(rt.GetPhoto))
 	rt.router.DELETE("/users/:user_id/photos/:photo_id", rt.wrap(rt.DeletePhoto))
 
+	rt.router.GET("/users/:user_id/photos/:photo_id/likes", rt.wrap(rt.GetLikes))
 	rt.router.PUT("/users/:user_id/photos/:photo_id/likes/:liker_uid", rt.wrap(rt.PutDeleteLike))
 	rt.router.DELETE("/users/:user_id/photos/:photo_id/likes/:liker_uid", rt.wrap(rt.PutDeleteLike))
+
+	rt.router.GET("/users/:user_id/photos/:photo_id/comments", rt.wrap(rt.GetComments))
+	rt.router.POST("/users/:user_id/photos/:photo_id/comments", rt.wrap(rt.PostComment))
+	rt.router.DELETE("/users/:user_id/photos/:photo_id/comments/:comment_id", rt.wrap(rt.DeleteComment))
 
 	rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))

@@ -61,8 +61,8 @@ func (db *appdbimpl) GetUserFollowers(uid string) (QueryResult, *[]structures.UI
 		return ERR_NOT_FOUND, nil, nil
 	}
 
-	rows, err := db.c.Query(`SELECT "follower", "user.name" FROM "follows", "users"
-							WHERE "follows.follower" = "users.uid"
+	rows, err := db.c.Query(`SELECT "follower", "user"."name" FROM "follows", "users"
+							WHERE "follows"."follower" = "users"."uid"
 							AND "followed" = ?`, uid)
 
 	followers, err := db.uidNameQuery(rows, err)
@@ -88,8 +88,8 @@ func (db *appdbimpl) GetUserFollowing(uid string) (QueryResult, *[]structures.UI
 		return ERR_NOT_FOUND, nil, nil
 	}
 
-	rows, err := db.c.Query(`SELECT "followed", "user.name" FROM "follows", "users"
-							WHERE "follows.followed" = "users.uid"
+	rows, err := db.c.Query(`SELECT "followed", "user"."name" FROM "follows", "users"
+							WHERE "follows"."followed" = "users"."uid"
 							AND "follower" = ?`, uid)
 
 	following, err := db.uidNameQuery(rows, err)
