@@ -81,7 +81,7 @@ func (rt *_router) PutDeleteLike(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	if success == database.ERR_NOT_FOUND {
-		helpers.SendNotFound(w, "User or photo not found", rt.baseLogger)
+		helpers.SendNotFound(w, "Resource not found", rt.baseLogger)
 		return
 	}
 
