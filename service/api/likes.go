@@ -81,7 +81,7 @@ func (rt *_router) PutDeleteLike(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	if success == database.ERR_NOT_FOUND {
-		helpers.SendBadRequest(w, "User or photo not found", rt.baseLogger)
+		helpers.SendNotFound(w, "User or photo not found", rt.baseLogger)
 		return
 	}
 
@@ -91,6 +91,11 @@ func (rt *_router) PutDeleteLike(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// User liked the photo successfully
-	helpers.SendStatus(http.StatusCreated, w, "Success", rt.baseLogger)
+	if r.Method == "PUT" {
+		// User liked the photo successfully
+		helpers.SendStatus(http.StatusCreated, w, "Success", rt.baseLogger)
+	} else {
+		// User unliked the photo successfully
+		w.WriteHeader(http.StatusNoContent)
+	}
 }

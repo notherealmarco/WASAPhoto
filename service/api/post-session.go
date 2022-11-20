@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/notherealmarco/WASAPhoto/service/api/helpers"
 	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
 	"github.com/notherealmarco/WASAPhoto/service/database/db_errors"
 )
@@ -33,7 +34,7 @@ func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httpro
 		uid, err = rt.db.CreateUser(request.Name)
 	}
 	if err != nil { // handle any other error
-		w.WriteHeader(http.StatusInternalServerError) // todo: is not ok
+		helpers.SendBadRequestError(err, "Bad request body", w, rt.baseLogger)
 		return
 	}
 
@@ -41,7 +42,7 @@ func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httpro
 	err = json.NewEncoder(w).Encode(_respbody{UID: uid})
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError) // todo: is not ok
+		helpers.SendInternalError(err, "Error encoding response", w, rt.baseLogger)
 		return
 	}
 }
