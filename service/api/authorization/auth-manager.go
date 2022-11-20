@@ -19,7 +19,7 @@ func BuildAuth(header string) (reqcontext.Authorization, error) {
 	return auth, nil
 }
 
-func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error), uid string, db database.AppDatabase, w http.ResponseWriter) bool {
+func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error), uid string, db database.AppDatabase, w http.ResponseWriter, notFoundStatus int) bool {
 	auth, err := f(db, uid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -36,7 +36,7 @@ func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcont
 	}
 	// requested user is not found -> 404 as the resource is not found
 	if auth == reqcontext.USER_NOT_FOUND {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(notFoundStatus)
 		return false
 	}
 	return true

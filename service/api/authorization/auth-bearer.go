@@ -29,7 +29,7 @@ func BuildBearer(header string) (*BearerAuth, error) {
 	return &BearerAuth{token: header[7:]}, nil
 }
 
-func (b *BearerAuth) GetToken() string {
+func (b *BearerAuth) GetUserID() string {
 	return b.token
 }
 

@@ -27,8 +27,9 @@ func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Re
 		auth, err := authorization.BuildAuth(r.Header.Get("Authorization"))
 
 		if err != nil {
+			auth = authorization.BuildAnonymous()
 			rt.baseLogger.WithError(err).Info("User not authorized")
-			return
+			// is not an error, just a not logged in user!
 		}
 
 		var ctx = reqcontext.RequestContext{

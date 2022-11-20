@@ -40,23 +40,40 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
+	CreateUser(name string) (string, error)
 	UserExists(uid string) (bool, error)
 	GetUserID(name string) (string, error)
-	UpdateUsername(uid, name string) error
-	CreateUser(name string) (string, error)
-	GetUserFollowers(uid string) ([]structures.UIDName, error)
-	FollowUser(uid string, follow string) error
-	UnfollowUser(uid string, unfollow string) error
-	BanUser(uid string, ban string) error
-	UnbanUser(uid string, unban string) error
 
-	PostPhoto(uid string) (int64, error)
-	LikePhoto(uid string, photo int64) error
-	UnlikePhoto(uid string, photo int64) error
+	UpdateUsername(uid, name string) error
+
+	GetUserFollowers(uid string) (QueryResult, *[]structures.UIDName, error) // todo: maybe use a pointer to a slice?
+	GetUserFollowing(uid string) (QueryResult, *[]structures.UIDName, error)
+	FollowUser(uid string, follow string) (QueryResult, error)
+	UnfollowUser(uid string, unfollow string) (QueryResult, error)
+
+	BanUser(uid string, ban string) (QueryResult, error)
+	UnbanUser(uid string, unban string) (QueryResult, error)
+
+	PostPhoto(uid string) (DBTransaction, int64, error)
+	DeletePhoto(uid string, photo int64) (bool, error)
+
+	GetPhotoLikes(uid string, photo int64) (QueryResult, *[]structures.UIDName, error)
+	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
+	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
 	GetUserProfile(uid string) (*UserProfile, error)
 
+	GetComments(uid string, photo_id int64) (QueryResult, *[]structures.Comment, error)
+	PostComment(uid string, photo_id int64, comment_user string, comment string) (QueryResult, error)
+	DeleteComment(uid string, photo_id int64, comment_id int64) (QueryResult, error)
+	GetCommentOwner(uid string, photo_id int64, comment_id int64) (QueryResult, string, error)
+
 	Ping() error
+}
+
+type DBTransaction interface {
+	Commit() error
+	Rollback() error
 }
 
 type appdbimpl struct {

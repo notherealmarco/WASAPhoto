@@ -19,7 +19,7 @@ const (
 	UNAUTHORIZED   = 1
 	FORBIDDEN      = 2
 	USER_NOT_FOUND = 3
-)
+) // todo: here?
 
 // RequestContext is the context of the request, for request-dependent parameters
 type RequestContext struct {
@@ -34,6 +34,7 @@ type RequestContext struct {
 
 type Authorization interface {
 	GetType() string
-	Authorized(db database.AppDatabase) (bool, error)
+	GetUserID() string
+	Authorized(db database.AppDatabase) (AuthStatus, error)
 	UserAuthorized(db database.AppDatabase, uid string) (AuthStatus, error)
 }

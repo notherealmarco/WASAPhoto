@@ -38,10 +38,11 @@ package api
 
 import (
 	"errors"
-	"github.com/notherealmarco/WASAPhoto/service/database"
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/notherealmarco/WASAPhoto/service/database"
+	"github.com/sirupsen/logrus"
 )
 
 // Config is used to provide dependencies and configuration to the New function.
@@ -51,6 +52,8 @@ type Config struct {
 
 	// Database is the instance of database.AppDatabase where data are saved
 	Database database.AppDatabase
+
+	DataPath string
 }
 
 // Router is the package API interface representing an API handler builder
@@ -82,6 +85,7 @@ func New(cfg Config) (Router, error) {
 		router:     router,
 		baseLogger: cfg.Logger,
 		db:         cfg.Database,
+		dataPath:   cfg.DataPath,
 	}, nil
 }
 
@@ -93,4 +97,6 @@ type _router struct {
 	baseLogger logrus.FieldLogger
 
 	db database.AppDatabase
+
+	dataPath string
 }
