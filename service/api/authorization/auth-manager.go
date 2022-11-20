@@ -4,8 +4,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/notherealmarco/WASAPhoto/service/api/helpers"
 	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
 	"github.com/notherealmarco/WASAPhoto/service/database"
+	"github.com/sirupsen/logrus"
 )
 
 func BuildAuth(header string) (reqcontext.Authorization, error) {
@@ -19,24 +21,23 @@ func BuildAuth(header string) (reqcontext.Authorization, error) {
 	return auth, nil
 }
 
-func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error), uid string, db database.AppDatabase, w http.ResponseWriter, notFoundStatus int) bool {
+func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcontext.AuthStatus, error), uid string, db database.AppDatabase, w http.ResponseWriter, l logrus.FieldLogger, notFoundStatus int) bool {
 	auth, err := f(db, uid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		// todo: log error and write it to the response
+		helpers.SendInternalError(err, "Authorization error", w, l)
 		return false
 	}
 	if auth == reqcontext.UNAUTHORIZED {
-		w.WriteHeader(http.StatusUnauthorized)
+		helpers.SendStatus(http.StatusUnauthorized, w, "Unauthorized", l)
 		return false
 	}
 	if auth == reqcontext.FORBIDDEN {
-		w.WriteHeader(http.StatusForbidden)
+		helpers.SendStatus(http.StatusForbidden, w, "Forbidden", l)
 		return false
 	}
 	// requested user is not found -> 404 as the resource is not found
 	if auth == reqcontext.USER_NOT_FOUND {
-		w.WriteHeader(notFoundStatus)
+		helpers.SendStatus(notFoundStatus, w, "Resource not found", l)
 		return false
 	}
 	return true

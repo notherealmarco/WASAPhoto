@@ -13,7 +13,7 @@ import (
 func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("user_id")
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 	var req structures.UserDetails

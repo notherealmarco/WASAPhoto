@@ -72,7 +72,7 @@ func (rt *_router) PostComment(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// check if the user is authorized to post a comment
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, request_body.UID, rt.db, w, http.StatusBadRequest) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, request_body.UID, rt.db, w, rt.baseLogger, http.StatusBadRequest) {
 		return
 	}
 
@@ -142,7 +142,7 @@ func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps http
 		// Authorized user is not the owner of the comment
 		// let's check if it's the owner of the photo
 
-		if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusForbidden) {
+		if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusForbidden) {
 			// The authorized user is not the owner of the photo, so we sent an error
 			return
 		}

@@ -62,7 +62,7 @@ func (rt *_router) PutDeleteLike(w http.ResponseWriter, r *http.Request, ps http
 
 	liker_uid := ps.ByName("liker_uid")
 
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, liker_uid, rt.db, w, http.StatusBadRequest) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, liker_uid, rt.db, w, rt.baseLogger, http.StatusBadRequest) {
 		return
 	}
 

@@ -20,7 +20,7 @@ func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	uid := ps.ByName("user_id")
 
 	// send error if the user has no permission to perform this action
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 
@@ -105,7 +105,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// send error if the user has no permission to perform this action (only the author can delete a photo)
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 

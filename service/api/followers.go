@@ -63,7 +63,7 @@ func (rt *_router) PutFollow(w http.ResponseWriter, r *http.Request, ps httprout
 	followed := ps.ByName("follower_uid")
 
 	// send error if the user has no permission to perform this action
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 
@@ -93,7 +93,7 @@ func (rt *_router) DeleteFollow(w http.ResponseWriter, r *http.Request, ps httpr
 	followed := ps.ByName("follower_uid")
 
 	// send error if the user has no permission to perform this action
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 
