@@ -89,3 +89,16 @@ func RollbackOrLogError(tx database.DBTransaction, l logrus.FieldLogger) {
 		l.WithError(err).Error("Error rolling back transaction")
 	}
 }
+
+func SendNotFoundIfBanned(db database.AppDatabase, uid string, banner string, w http.ResponseWriter, l logrus.FieldLogger) bool {
+	banned, err := db.IsBanned(uid, banner)
+	if err != nil {
+		SendInternalError(err, "Database error: IsBanned", w, l)
+		return false
+	}
+	if banned {
+		SendNotFound(w, "User not found", l)
+		return false
+	}
+	return true
+}

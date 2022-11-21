@@ -53,6 +53,7 @@ type AppDatabase interface {
 
 	BanUser(uid string, ban string) (QueryResult, error)
 	UnbanUser(uid string, unban string) (QueryResult, error)
+	IsBanned(uid string, banner string) (bool, error)
 
 	PostPhoto(uid string) (DBTransaction, int64, error)
 	DeletePhoto(uid string, photo int64) (bool, error)
@@ -61,7 +62,7 @@ type AppDatabase interface {
 	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
-	GetUserProfile(uid string) (*UserProfile, error)
+	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error)
 
 	GetComments(uid string, photo_id int64) (QueryResult, *[]structures.Comment, error)
 	PostComment(uid string, photo_id int64, comment_user string, comment string) (QueryResult, error)

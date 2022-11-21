@@ -12,7 +12,7 @@ import (
 //todo
 
 // Check if user exists
-func (db *appdbimpl) UserExists(uid string) (bool, error) {
+func (db *appdbimpl) UserExists(uid string) (bool, error) { //todo: refactor code
 	var name string
 	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, uid).Scan(&name)
 
@@ -202,4 +202,17 @@ func (db *appdbimpl) UnbanUser(uid string, unban string) (QueryResult, error) {
 		return ERR_NOT_FOUND, nil
 	}
 	return SUCCESS, nil
+}
+
+// Is user banned by another user
+func (db *appdbimpl) IsBanned(uid string, banner string) (bool, error) {
+
+	var cnt int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM "bans" WHERE "user" = ? AND "ban" = ?`, banner, uid).Scan(&cnt)
+
+	if err != nil {
+		return false, err
+	}
+
+	return cnt > 0, nil
 }

@@ -42,3 +42,20 @@ func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcont
 	}
 	return true
 }
+
+func SendErrorIfNotLoggedIn(f func(db database.AppDatabase) (reqcontext.AuthStatus, error), db database.AppDatabase, w http.ResponseWriter, l logrus.FieldLogger) bool {
+
+	auth, err := f(db)
+
+	if err != nil {
+		helpers.SendInternalError(err, "Authorization error", w, l)
+		return false
+	}
+
+	if auth == reqcontext.UNAUTHORIZED {
+		helpers.SendStatus(http.StatusUnauthorized, w, "Unauthorized", l)
+		return false
+	}
+
+	return true
+}

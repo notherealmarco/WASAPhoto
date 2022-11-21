@@ -73,6 +73,9 @@ func (rt *_router) PostComment(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// check if the user is authorized to post a comment
 	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, request_body.UID, rt.db, w, rt.baseLogger, http.StatusBadRequest) {
+		// It returns 400 Bad Request if the user_id field in the request body is missing or an invalid user_id
+		// It returns 401 if the user is not logged in
+		// It returns 403 if the user is not authorized to post a comment as the requested user
 		return
 	}
 
