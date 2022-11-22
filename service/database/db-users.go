@@ -48,7 +48,7 @@ func (db *appdbimpl) UpdateUsername(uid string, name string) error {
 }
 
 // Get user followers
-func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
 	exists, err := db.UserExists(uid)
@@ -70,7 +70,9 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string) (QueryR
 								AND "bans"."ban" = "follows"."follower"
 							)
 
-							AND "followed" = ?`, uid, requesting_uid)
+							AND "followed" = ?
+							OFFSET ?
+							LIMIT ?`, uid, requesting_uid, start_index, limit)
 
 	followers, err := db.uidNameQuery(rows, err)
 
@@ -82,7 +84,7 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string) (QueryR
 }
 
 // Get user following
-func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
 	exists, err := db.UserExists(uid)
@@ -104,7 +106,9 @@ func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string) (QueryR
 								AND "bans"."ban" = "follows"."followed"
 							)
 
-							AND "follower" = ?`, uid, requesting_uid)
+							AND "follower" = ?
+							OFFSET ?
+							LIMIT ?`, uid, requesting_uid, start_index, offset)
 
 	following, err := db.uidNameQuery(rows, err)
 

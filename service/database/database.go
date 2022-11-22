@@ -48,8 +48,8 @@ type AppDatabase interface {
 
 	UpdateUsername(uid, name string) error
 
-	GetUserFollowers(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error) // todo: maybe use a pointer to a slice?
-	GetUserFollowing(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error)
+	GetUserFollowers(uid string, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error)
+	GetUserFollowing(uid string, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error)
 	FollowUser(uid string, follow string) (QueryResult, error)
 	UnfollowUser(uid string, unfollow string) (QueryResult, error)
 
@@ -64,7 +64,7 @@ type AppDatabase interface {
 	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
-	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error)
+	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error) // should support limits
 	GetUserStream(uid string, start_index int, limit int) (*[]structures.Photo, error)
 
 	GetComments(uid string, photo_id int64, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.Comment, error)
