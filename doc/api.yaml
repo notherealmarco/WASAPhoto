@@ -81,7 +81,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
 
   /users/{user_id}/followers:
     get:
@@ -121,7 +121,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
   /users/{user_id}/following:
     get:
       tags: ["followers"]
@@ -161,7 +161,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
 
   /users/{user_id}/followers/{follower_uid}:
     parameters:
@@ -200,7 +200,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Forbidden"
+                status: "Forbidden"
         '404':
           description: The resource does not exist.
           content:
@@ -208,7 +208,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
         '400':
           description: Trying to follow a user that does not exist.
           content:
@@ -216,7 +216,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
     delete:
       tags: ["followers"]
       summary: Unfollows a user
@@ -234,7 +234,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
 
   /users/{user_id}/bans/{ban_uid}:
     parameters:
@@ -267,7 +267,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Forbidden"
+                status: "Forbidden"
         '404':
           description: The user does not exist.
           content:
@@ -275,7 +275,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
 
     delete:
       tags: ["bans"]
@@ -294,7 +294,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Forbidden"
+                status: "Forbidden"
         '404':
           description: The user is not banned by the user.
           content:
@@ -302,7 +302,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "User not found"
+                status: "User not found"
 
   /users/{user_id}/photos/{photo_id}/likes:
     get:
@@ -361,7 +361,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/likes/{liker_uid}:
     parameters:
@@ -400,7 +400,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Forbidden"
+                status: "Forbidden"
         '404':
           description: Resource not found (or the author of the photo has banned the authorized user).
           content:
@@ -408,7 +408,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
         '400':
           description: Bad URI (maybe liker_uid is invalid).
           content:
@@ -416,7 +416,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Bad photo_id"
+                status: "Bad photo_id"
     delete:
       tags: ["likes"]
       summary: Unlikes a photo
@@ -434,7 +434,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
   /users:
     get:
       tags: ["search"]
@@ -486,7 +486,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
         '400':
           description: Some parameters are malformed.
           content:
@@ -494,7 +494,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Invalid start_index or limit value"
+                status: "Invalid start_index or limit value"
         '401':
           description: The user is not logged in.
           content:
@@ -502,7 +502,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Unauthorized"
+                status: "Unauthorized"
 
   /users/{user_id}:
     get:
@@ -539,7 +539,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /users/{user_id}/photos:
     parameters:
@@ -584,7 +584,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
         '400':
           description: Bad request, there is an error in one of the parameters.
           content:
@@ -592,7 +592,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Invalid limit or start_index"
+                status: "Invalid limit or start_index"
 
     post:
       tags: ["photos"]
@@ -624,7 +624,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}:
     parameters:
@@ -664,7 +664,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
     delete:
       tags: ["photos"]
       summary: Deletes a photo
@@ -682,7 +682,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Unauthorized"
+                status: "Unauthorized"
         '404':
           description: User or photo not found.
           content:
@@ -690,7 +690,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/comments:
     parameters:
@@ -751,7 +751,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
     post:
       tags: ["comments"]
       summary: Comments a photo
@@ -777,7 +777,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/comments/{comment_id}:
     delete:
@@ -816,7 +816,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Unauthorized"
+                status: "Unauthorized"
         '404':
           description: The comment does not exists.
           content:
@@ -824,7 +824,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Resource not found"
+                status: "Resource not found"
 
   /stream: # todo review path
     get:
