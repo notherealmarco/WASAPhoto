@@ -479,6 +479,60 @@ paths:
                 error: "Resource not found"
 
   /users/{user_id}/photos:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The user ID of the user who uploads the photo.
+
+    get:
+      tags: ["photos"]
+      summary: Returns user photos
+      description: Returns the list of photos uploaded by a user.
+      operationId: getUserPhotos
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: The starting offset.
+          required: false
+      responses:
+        '200':
+          description: Returns the user photos list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_photo_stream"
+        '404':
+          description: User not found (or the authorized user is banned).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
+        '400':
+          description: Bad request, there is an error in one of the parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Invalid limit or start_index"
+
     post:
       tags: ["photos"]
       summary: Uploads a photo
@@ -486,13 +540,6 @@ paths:
       operationId: uploadPhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user who uploads the photo.
       requestBody:
         content:
           image/jpeg:
@@ -823,6 +870,14 @@ components:
       type: integer
       example: 69
       description: Number of following users.
+    liked_boolean:
+      type: boolean
+      example: true
+      description: Whether the user liked the photo.
+    photos_n:
+      type: integer
+      example: 90
+      description: Number of photos.
     user_profile:
       type: object
       description: The profile of the user.
@@ -834,7 +889,7 @@ components:
         following:
           $ref: "#/components/schemas/following_n"
         photos:
-          $ref: "#/components/schemas/user_photo_stream"
+          $ref: "#/components/schemas/photos_n"
     user_photo_stream:
       type: array
       minItems: 0
@@ -850,6 +905,8 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        liked:
+          $ref: "#/components/schemas/liked_boolean"
     photo_stream:
       type: array
       minItems: 0
@@ -869,6 +926,8 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        liked:
+          $ref: "#/components/schemas/liked_boolean"
     comments:
       type: array
       minItems: 0
