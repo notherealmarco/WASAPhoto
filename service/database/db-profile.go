@@ -50,6 +50,10 @@ func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryRes
 	var follow_status bool
 	err = db.c.QueryRow(`SELECT EXISTS (SELECT * FROM "follows" WHERE "follower" = ? AND "followed" = ?)`, requesting_uid, uid).Scan(&follow_status)
 
+	if err != nil {
+		return ERR_INTERNAL, nil, err
+	}
+
 	return SUCCESS, &structures.UserProfile{
 		UID:       uid,
 		Name:      name,
