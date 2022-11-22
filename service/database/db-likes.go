@@ -8,8 +8,11 @@ import (
 // Get the list of users who liked a photo
 func (db *appdbimpl) GetPhotoLikes(uid string, photo int64, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error) {
 
-	// Check if the photo exists, as it could exist but have no likes
-	exists, err := db.photoExists(uid, photo)
+	// Check if the photo exists, as it could exist but have no likes.
+	//
+	// This also checks if the author has banned the requesting user
+	// as he should not be able to see anything related to his photos
+	exists, err := db.PhotoExists(uid, photo, requesting_uid)
 	if err != nil {
 		return ERR_INTERNAL, nil, err
 	}
@@ -52,7 +55,10 @@ func (db *appdbimpl) LikePhoto(uid string, photo int64, liker_uid string) (Query
 	// Check if the photo exists, as API specification requires
 	// photos to be identified also by the user who posted them.
 	// But our DB implementation only requires the photo id.
-	exists, err := db.photoExists(uid, photo)
+	//
+	// This also checks if the author of the photo has banned the requesting user
+	// as he should not be able to like his photos
+	exists, err := db.PhotoExists(uid, photo, liker_uid)
 	if err != nil || !exists {
 		return ERR_NOT_FOUND, err
 	}

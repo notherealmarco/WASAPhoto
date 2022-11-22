@@ -12,7 +12,10 @@ func (db *appdbimpl) PostComment(uid string, photo_id int64, comment_user string
 	// Check if the photo exists, as API specification requires
 	// photos to be identified also by the user who posted them.
 	// But our DB implementation only requires the photo id.
-	exists, err := db.photoExists(uid, photo_id)
+	//
+	// This also checks if the author has banned the user who is posting the comment
+	// as he should not be able to post comments on his photos
+	exists, err := db.PhotoExists(uid, photo_id, comment_user)
 	if err != nil || !exists {
 		return ERR_NOT_FOUND, err
 	}
@@ -33,7 +36,7 @@ func (db *appdbimpl) PostComment(uid string, photo_id int64, comment_user string
 
 func (db *appdbimpl) GetCommentOwner(uid string, photo_id int64, comment_id int64) (QueryResult, string, error) {
 
-	// Check if the photo exists, as it exist but have no comments
+	// Check if the photo exists, as it may exist but have no comments
 	exists, err := db.photoExists(uid, photo_id)
 	if err != nil || !exists {
 		return ERR_NOT_FOUND, "", err
@@ -84,7 +87,8 @@ func (db *appdbimpl) DeleteComment(uid string, photo_id int64, comment_id int64)
 func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.Comment, error) {
 
 	// Check if the photo exists, as it exist but have no comments
-	exists, err := db.photoExists(uid, photo_id)
+	// this also checks if the author has banned the requesting user
+	exists, err := db.PhotoExists(uid, photo_id, requesting_uid)
 	if err != nil || !exists {
 		return ERR_NOT_FOUND, nil, err
 	}
