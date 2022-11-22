@@ -4,9 +4,9 @@ info:
   description: |-
     Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
     upload your photos directly from your PC, and they will be visible to everyone following you.
-  version: "2.0.0"
+  version: "3.0"
 tags:
-  - name: login
+  - name: logins
     description: Login API
   - name: username
     description: Operations related to username
