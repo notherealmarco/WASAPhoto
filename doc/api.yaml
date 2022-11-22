@@ -462,13 +462,7 @@ paths:
                 username: "Maria"
                 followers: 25
                 following: 32
-                photos:
-                  - photo_id: 2341
-                    upload_time: "2020-11-20T12:00:00Z"
-                    likes: 2
-                  - photo_id: 2342
-                    upload_time: "2022-10-23T12:01:00Z"
-                    likes: 5
+                photos: 50
         '404':
           description: User not found (or the authorized user is banned).
           content:
@@ -793,12 +787,12 @@ paths:
                 $ref: "#/components/schemas/photo_stream"
               example:
                 - user_id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
-                - username: "Federicus"
-                - photo_id: 1520
-                - upload_time: "2020-11-20T12:00:00Z"
-                - likes: 93
-
-
+                  username: "Federicus"
+                  photo_id: 157
+                  upload_time: "2020-11-20T12:00:00Z"
+                  likes: 93
+                  comments: 13
+                  liked: true
 
 components:
   securitySchemes:
@@ -864,6 +858,10 @@ components:
       type: integer
       example: 90
       description: Number of likes.
+    comments_n:
+      type: integer
+      example: 7
+      description: Number of comments on the photo.
     followers_n:
       type: integer
       example: 420
@@ -908,6 +906,8 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        comments:
+          $ref: "#/components/schemas/comments_n"
         liked:
           $ref: "#/components/schemas/liked_boolean"
     photo_stream:
@@ -930,6 +930,8 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        comments:
+          $ref: "#/components/schemas/comments_n"
         liked:
           $ref: "#/components/schemas/liked_boolean"
     comments:
