@@ -462,6 +462,7 @@ paths:
                 username: "Maria"
                 followers: 25
                 following: 32
+                followed: true
                 photos: 50
         '404':
           description: User not found (or the authorized user is banned).
@@ -870,10 +871,14 @@ components:
       type: integer
       example: 69
       description: Number of following users.
-    liked_boolean:
+    like_status:
       type: boolean
       example: true
       description: Whether the user liked the photo.
+    follow_status:
+      type: boolean
+      example: false
+      description: Whether the user follows the other user.
     photos_n:
       type: integer
       example: 90
@@ -890,6 +895,8 @@ components:
           $ref: "#/components/schemas/following_n"
         photos:
           $ref: "#/components/schemas/photos_n"
+        followed:
+          $ref: "#/components/schemas/follow_status"
     user_photo_stream:
       type: array
       minItems: 0
@@ -909,7 +916,7 @@ components:
         comments:
           $ref: "#/components/schemas/comments_n"
         liked:
-          $ref: "#/components/schemas/liked_boolean"
+          $ref: "#/components/schemas/like_status"
     photo_stream:
       type: array
       minItems: 0
@@ -933,7 +940,7 @@ components:
         comments:
           $ref: "#/components/schemas/comments_n"
         liked:
-          $ref: "#/components/schemas/liked_boolean"
+          $ref: "#/components/schemas/like_status"
     comments:
       type: array
       minItems: 0
