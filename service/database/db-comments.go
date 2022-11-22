@@ -81,7 +81,7 @@ func (db *appdbimpl) DeleteComment(uid string, photo_id int64, comment_id int64)
 	return SUCCESS, nil
 }
 
-func (db *appdbimpl) GetComments(uid string, photo_id int64) (QueryResult, *[]structures.Comment, error) {
+func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.Comment, error) {
 
 	// Check if the photo exists, as it exist but have no comments
 	exists, err := db.photoExists(uid, photo_id)
@@ -89,7 +89,15 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64) (QueryResult, *[]st
 		return ERR_NOT_FOUND, nil, err
 	}
 
-	rows, err := db.c.Query(`SELECT "id", "user", "comment", "date" FROM "comments" WHERE "photo" = ?`, photo_id)
+	rows, err := db.c.Query(`SELECT "c"."id", "c"."user", "c"."comment", "c"."date" FROM "comments" AS "c"
+								WHERE "c"."photo" = ?
+								AND "c"."user" NOT IN (
+									SELECT "bans"."user" FROM "bans"
+									WHERE "bans"."user" = ?
+									AND "bans"."ban" = "c"."user"
+								)
+								OFFSET ?
+								LIMIT ?`, photo_id, requesting_uid, start_index, limit)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err

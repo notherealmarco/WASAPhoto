@@ -28,10 +28,10 @@ func (rt *_router) GetFollowersFollowing(w http.ResponseWriter, r *http.Request,
 	// Check if client is asking for followers or following
 	if strings.HasSuffix(r.URL.Path, "/followers") {
 		// Get the followers from the database
-		status, users, err = rt.db.GetUserFollowers(uid)
+		status, users, err = rt.db.GetUserFollowers(uid, ctx.Auth.GetUserID())
 	} else {
 		// Get the following users from the database
-		status, users, err = rt.db.GetUserFollowing(uid)
+		status, users, err = rt.db.GetUserFollowing(uid, ctx.Auth.GetUserID())
 	}
 
 	// Send a 500 response if there was an error

@@ -48,7 +48,7 @@ func (db *appdbimpl) UpdateUsername(uid string, name string) error {
 }
 
 // Get user followers
-func (db *appdbimpl) GetUserFollowers(uid string) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
 	exists, err := db.UserExists(uid)
@@ -63,7 +63,14 @@ func (db *appdbimpl) GetUserFollowers(uid string) (QueryResult, *[]structures.UI
 
 	rows, err := db.c.Query(`SELECT "follower", "user"."name" FROM "follows", "users"
 							WHERE "follows"."follower" = "users"."uid"
-							AND "followed" = ?`, uid)
+							
+							AND "follows"."follower" NOT IN (
+								SELECT "bans"."user" FROM "bans"
+								WHERE "bans"."user" = ?
+								AND "bans"."ban" = "follows"."follower"
+							)
+
+							AND "followed" = ?`, uid, requesting_uid)
 
 	followers, err := db.uidNameQuery(rows, err)
 
@@ -75,7 +82,7 @@ func (db *appdbimpl) GetUserFollowers(uid string) (QueryResult, *[]structures.UI
 }
 
 // Get user following
-func (db *appdbimpl) GetUserFollowing(uid string) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
 	exists, err := db.UserExists(uid)
@@ -90,7 +97,14 @@ func (db *appdbimpl) GetUserFollowing(uid string) (QueryResult, *[]structures.UI
 
 	rows, err := db.c.Query(`SELECT "followed", "user"."name" FROM "follows", "users"
 							WHERE "follows"."followed" = "users"."uid"
-							AND "follower" = ?`, uid)
+
+							AND "follows"."followed" NOT IN (
+								SELECT "bans"."user" FROM "bans"
+								WHERE "bans"."user" = ?
+								AND "bans"."ban" = "follows"."followed"
+							)
+
+							AND "follower" = ?`, uid, requesting_uid)
 
 	following, err := db.uidNameQuery(rows, err)
 
@@ -215,4 +229,27 @@ func (db *appdbimpl) IsBanned(uid string, banner string) (bool, error) {
 	}
 
 	return cnt > 0, nil
+}
+
+// Search by name
+func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error) {
+
+	rows, err := db.c.Query(`SELECT "uid", "name" FROM "users"
+							WHERE "name" LIKE ?
+
+							AND "uid" NOT IN (
+								SELECT "bans"."user" FROM "bans"
+								WHERE "bans"."user" = "users"."uid"
+								AND "bans"."ban" = ?
+							)
+							OFFSET ?
+							LIMIT ?`, name, requesting_uid, start_index, limit)
+
+	users, err := db.uidNameQuery(rows, err)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

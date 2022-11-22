@@ -34,7 +34,7 @@ func (rt *_router) GetComments(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// get the user's comments
-	success, comments, err := rt.db.GetComments(uid, photo_id)
+	success, comments, err := rt.db.GetComments(uid, photo_id, ctx.Auth.GetUserID())
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetComments", w, rt.baseLogger)

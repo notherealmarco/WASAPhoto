@@ -5,6 +5,8 @@ import (
 	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
+//this should be changed, but we need to change OpenAPI first
+
 // Get user profile, including username, followers, following, and photos
 func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error) {
 	// Get user info
@@ -43,21 +45,46 @@ func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserPr
 		return ERR_INTERNAL, nil, err
 	}
 
-	// Convert []Photo to []UserPhoto
-	user_photos := make([]structures.UserPhoto, 0)
-	for _, photo := range *photos {
-		user_photos = append(user_photos, structures.UserPhoto{
-			ID:       photo.ID,
-			Likes:    photo.Likes,
-			Comments: photo.Comments,
-			Date:     photo.Date,
-		})
-	}
-
 	return SUCCESS, &structures.UserProfile{
 		UID:       uid,
 		Name:      name,
 		Following: following,
 		Followers: followers,
-		Photos:    &user_photos}, nil
+		Photos:    photos,
+	}, nil
+}
+
+func (db *appdbimpl) getUserPhotos(uid string) (*[]structures.UserPhoto, error) {
+
+	// Get photos
+	rows, err := db.c.Query(`SELECT "p"."id", "p"."date",
+								(
+									SELECT COUNT(*) AS "likes" FROM "likes" AS "l"
+									WHERE "l"."photo_id" = "p"."id"
+								),
+								(
+									SELECT COUNT(*) AS "comments" FROM "comments" AS "c"
+									WHERE "c"."photo" = "p"."id"
+								)
+ 								FROM "photos" AS "p"
+								WHERE "p"."user" = ?`, uid)
+	if err != nil {
+		// Return the error
+		return nil, err
+	}
+
+	photos := make([]structures.UserPhoto, 0)
+
+	for rows.Next() {
+		// If there is a next row, we create an instance of Photo and add it to the slice
+		var photo structures.UserPhoto
+		err = rows.Scan(&photo.ID, &photo.Date, &photo.Likes, &photo.Comments)
+		if err != nil {
+			// Return the error
+			return nil, err
+		}
+		photos = append(photos, photo)
+	}
+
+	return &photos, nil
 }

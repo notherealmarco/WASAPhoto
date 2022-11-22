@@ -29,7 +29,7 @@ func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// get the user's likes
-	success, likes, err := rt.db.GetPhotoLikes(uid, photo_id)
+	success, likes, err := rt.db.GetPhotoLikes(uid, photo_id, ctx.Auth.GetUserID())
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetLikes", w, rt.baseLogger)

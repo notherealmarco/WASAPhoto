@@ -6,7 +6,7 @@ import (
 )
 
 // Get the list of users who liked a photo
-func (db *appdbimpl) GetPhotoLikes(uid string, photo int64) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetPhotoLikes(uid string, photo int64, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error) {
 
 	// Check if the photo exists, as it could exist but have no likes
 	exists, err := db.photoExists(uid, photo)
@@ -20,7 +20,14 @@ func (db *appdbimpl) GetPhotoLikes(uid string, photo int64) (QueryResult, *[]str
 
 	rows, err := db.c.Query(`SELECT "users"."uid", "users"."name" FROM "likes", "users"
 								WHERE "likes"."photo_id" = ?
-								AND "likes"."user" = "users"."uid"`, photo)
+								AND "likes"."user" NOT IN (
+									SELECT "bans"."user" FROM "bans"
+									WHERE "bans"."user" = ?
+									AND "bans"."ban" = "likes"."user"
+								)
+								AND "likes"."user" = "users"."uid"
+								OFFSET ?
+								LIMIT ?`, photo, requesting_uid, start_index, limit)
 	if err != nil {
 		return ERR_INTERNAL, nil, err
 	}
