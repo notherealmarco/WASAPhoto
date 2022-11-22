@@ -39,7 +39,8 @@ func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserPr
 		return ERR_INTERNAL, nil, err
 	}
 
-	photos, err := db.getUserPhotos(uid)
+	var photos int64
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM "photos" WHERE "photos"."user" = ?`, uid).Scan(&following)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err
@@ -54,7 +55,7 @@ func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserPr
 	}, nil
 }
 
-func (db *appdbimpl) getUserPhotos(uid string) (*[]structures.UserPhoto, error) {
+func (db *appdbimpl) GetUserPhotos(uid string, start_index int, limit int) (*[]structures.UserPhoto, error) {
 
 	// Get photos
 	rows, err := db.c.Query(`SELECT "p"."id", "p"."date",
@@ -65,9 +66,16 @@ func (db *appdbimpl) getUserPhotos(uid string) (*[]structures.UserPhoto, error) 
 								(
 									SELECT COUNT(*) AS "comments" FROM "comments" AS "c"
 									WHERE "c"."photo" = "p"."id"
+								),
+								EXISTS (
+									SELECT * FROM "likes" AS "l"
+									WHERE "l"."photo_id" = "p"."id"
+									AND "l"."user" = ?
 								)
  								FROM "photos" AS "p"
-								WHERE "p"."user" = ?`, uid)
+								WHERE "p"."user" = ?
+								OFFSET ?
+								LIMIT ?`, uid, uid, start_index, limit)
 	if err != nil {
 		// Return the error
 		return nil, err
@@ -78,7 +86,7 @@ func (db *appdbimpl) getUserPhotos(uid string) (*[]structures.UserPhoto, error) 
 	for rows.Next() {
 		// If there is a next row, we create an instance of Photo and add it to the slice
 		var photo structures.UserPhoto
-		err = rows.Scan(&photo.ID, &photo.Date, &photo.Likes, &photo.Comments)
+		err = rows.Scan(&photo.ID, &photo.Date, &photo.Likes, &photo.Comments, &photo.Liked)
 		if err != nil {
 			// Return the error
 			return nil, err

@@ -235,6 +235,23 @@ func (db *appdbimpl) IsBanned(uid string, banner string) (bool, error) {
 	return cnt > 0, nil
 }
 
+func (db *appdbimpl) GetUserBans(uid string, start_index int, limit int) (*[]structures.UIDName, error) {
+
+	rows, err := db.c.Query(`SELECT "ban", "user"."name" FROM "bans", "users"
+							WHERE "bans"."ban" = "users"."uid"
+							AND "bans"."user" = ?
+							OFFSET ?
+							LIMIT ?`, uid, start_index, limit)
+
+	bans, err := db.uidNameQuery(rows, err)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bans, nil
+}
+
 // Search by name
 func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error) {
 

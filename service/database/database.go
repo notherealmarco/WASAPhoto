@@ -56,6 +56,7 @@ type AppDatabase interface {
 	BanUser(uid string, ban string) (QueryResult, error)
 	UnbanUser(uid string, unban string) (QueryResult, error)
 	IsBanned(uid string, banner string) (bool, error)
+	GetUserBans(uid string, start_index int, limit int) (*[]structures.UIDName, error)
 
 	PostPhoto(uid string) (DBTransaction, int64, error)
 	DeletePhoto(uid string, photo int64) (bool, error)
@@ -64,7 +65,8 @@ type AppDatabase interface {
 	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
-	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error) // should support limits
+	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error)
+	GetUserPhotos(uid string, start_index int, limit int) (*[]structures.UserPhoto, error)
 	GetUserStream(uid string, start_index int, limit int) (*[]structures.Photo, error)
 
 	GetComments(uid string, photo_id int64, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.Comment, error)

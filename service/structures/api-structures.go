@@ -27,6 +27,7 @@ type Photo struct { //todo: move to structures
 	Likes    int64  `json:"likes"`
 	Comments int64  `json:"comments"`
 	Date     string `json:"date"`
+	Liked    bool   `json:"liked"`
 }
 
 type UserPhoto struct {
@@ -34,12 +35,13 @@ type UserPhoto struct {
 	Likes    int64  `json:"likes"`
 	Comments int64  `json:"comments"`
 	Date     string `json:"date"`
+	Liked    bool   `json:"liked"`
 }
 
 type UserProfile struct {
-	UID       string       `json:"user_id"`
-	Name      string       `json:"name"`
-	Following int64        `json:"following"`
-	Followers int64        `json:"followers"`
-	Photos    *[]UserPhoto `json:"photos"` //todo: check json names
+	UID       string `json:"user_id"`
+	Name      string `json:"name"`
+	Following int64  `json:"following"`
+	Followers int64  `json:"followers"`
+	Photos    int64  `json:"photos"` //todo: check json names
 }
