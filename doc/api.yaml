@@ -327,15 +327,13 @@ paths:
         - name: limit
           in: query
           schema:
-            type: integer
-            default: 25
+            $ref: "#/components/schemas/limit"
           description: The number of elements to show.
           required: false
         - name: start_index
           in: query
           schema:
-            type: integer
-            default: 0
+            $ref: "#/components/schemas/start_index"
           description: The starting offset.
           required: false
       responses:
@@ -498,15 +496,13 @@ paths:
         - name: limit
           in: query
           schema:
-            type: integer
-            default: 25
+            $ref: "#/components/schemas/limit"
           description: The number of elements to show.
           required: false
         - name: start_index
           in: query
           schema:
-            type: integer
-            default: 0
+            $ref: "#/components/schemas/start_index"
           description: The starting offset.
           required: false
       responses:
@@ -654,15 +650,13 @@ paths:
         - name: limit
           in: query
           schema:
-            type: integer
-            default: 25
+            $ref: "#/components/schemas/limit"
           description: The number of elements to show.
           required: false
         - name: start_index
           in: query
           schema:
-            type: integer
-            default: 0
+            $ref: "#/components/schemas/start_index"
           description: The starting offset.
           required: false
       security:
@@ -779,15 +773,13 @@ paths:
           - name: limit
             in: query
             schema:
-              type: integer
-              default: 25
+              $ref: "#/components/schemas/limit"
             description: The number of elements to show.
             required: false
           - name: start_index
             in: query
             schema:
-              type: integer
-              default: 0
+              $ref: "#/components/schemas/start_index"
             description: The starting offset.
             required: false
       responses:
@@ -813,6 +805,14 @@ components:
       scheme: bearer
 
   schemas:
+    start_index:
+      type: integer
+      description: The starting offset.
+      default: 0
+    limit:
+      type: integer
+      description: The number of elements to show.
+      default: 15
     uid_name:
       type: object
       properties:
