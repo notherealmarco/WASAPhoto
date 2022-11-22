@@ -23,8 +23,9 @@ func (db *appdbimpl) PostComment(uid string, photo_id int64, comment_user string
 	_, err = db.c.Exec(`PRAGMA foreign_keys = ON;
 						INSERT INTO "comments" ("user", "photo", "comment", "date") VALUES (?, ?, ?, ?)`, comment_user, photo_id, comment, time.Now().Format(time.RFC3339))
 
-	// todo: we don't actually need it, it's already done before
 	if db_errors.ForeignKeyViolation(err) {
+		// trying to post a comment on a photo that does not exist
+		// (actually this should never happen, as we checked if the photo exists before)
 		return ERR_NOT_FOUND, nil
 	}
 

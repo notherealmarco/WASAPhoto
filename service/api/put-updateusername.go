@@ -21,19 +21,12 @@ func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	//err := json.NewDecoder(r.Body).Decode(&req) //todo: capire se serve close
-
-	//if err != nil {
-	//	w.WriteHeader(http.StatusBadRequest) // todo: move to DecodeOrBadRequest helper
-	//	return
-	//}
-
 	err := rt.db.UpdateUsername(uid, req.Name)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError) // todo: is not ok, maybe let's use a helper
+		helpers.SendInternalError(err, "Database error: UpdateUsername", w, rt.baseLogger)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent) // todo: change to 204 also in API spec
+	w.WriteHeader(http.StatusNoContent)
 }

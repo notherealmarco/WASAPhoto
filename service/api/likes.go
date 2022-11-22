@@ -14,6 +14,10 @@ import (
 
 func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	if !authorization.SendErrorIfNotLoggedIn(ctx.Auth.Authorized, rt.db, w, rt.baseLogger) {
+		return
+	}
+
 	// get the user id from the url
 	uid := ps.ByName("user_id")
 	photo_id, err := strconv.ParseInt(ps.ByName("photo_id"), 10, 64)

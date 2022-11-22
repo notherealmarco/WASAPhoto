@@ -23,7 +23,7 @@ type _respbody struct {
 func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var request _reqbody
-	err := json.NewDecoder(r.Body).Decode(&request) //todo: capire se serve close
+	err := json.NewDecoder(r.Body).Decode(&request)
 
 	var uid string
 	if err == nil { // test if user exists

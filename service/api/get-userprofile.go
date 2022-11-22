@@ -64,7 +64,7 @@ func (rt *_router) GetUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Get user photos
-	photos, err := rt.db.GetUserPhotos(uid, start_index, limit)
+	photos, err := rt.db.GetUserPhotos(uid, ctx.Auth.GetUserID(), start_index, limit)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetUserPhotos", w, rt.baseLogger)

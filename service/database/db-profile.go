@@ -64,7 +64,7 @@ func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryRes
 	}, nil
 }
 
-func (db *appdbimpl) GetUserPhotos(uid string, start_index int, limit int) (*[]structures.UserPhoto, error) {
+func (db *appdbimpl) GetUserPhotos(uid string, requesting_uid string, start_index int, limit int) (*[]structures.UserPhoto, error) {
 
 	// Get photos
 	rows, err := db.c.Query(`SELECT "p"."id", "p"."date",
@@ -83,8 +83,9 @@ func (db *appdbimpl) GetUserPhotos(uid string, start_index int, limit int) (*[]s
 								)
  								FROM "photos" AS "p"
 								WHERE "p"."user" = ?
-								OFFSET ?
-								LIMIT ?`, uid, uid, start_index, limit)
+								
+								LIMIT ?
+								OFFSET ?`, requesting_uid, uid, limit, start_index)
 	if err != nil {
 		// Return the error
 		return nil, err

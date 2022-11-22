@@ -21,7 +21,7 @@ type Comment struct {
 	Date      string `json:"date"`
 }
 
-type Photo struct { //todo: move to structures
+type Photo struct {
 	UID      string `json:"user_id"`
 	ID       int64  `json:"photo_id"`
 	Likes    int64  `json:"likes"`
@@ -44,5 +44,5 @@ type UserProfile struct {
 	Following int64  `json:"following"`
 	Followers int64  `json:"followers"`
 	Followed  bool   `json:"followed"`
-	Photos    int64  `json:"photos"` //todo: check json names
+	Photos    int64  `json:"photos"`
 }

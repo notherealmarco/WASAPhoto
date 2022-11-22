@@ -41,7 +41,6 @@ func SendStatus(httpStatus int, w http.ResponseWriter, description string, l log
 	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
 	if err != nil {
 		l.WithError(err).Error("Error encoding json")
-		//todo: empty response?
 	}
 }
 
@@ -50,7 +49,6 @@ func SendNotFound(w http.ResponseWriter, description string, l logrus.FieldLogge
 	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
 	if err != nil {
 		l.WithError(err).Error("Error encoding json")
-		//todo: empty response?
 	}
 }
 
@@ -59,7 +57,6 @@ func SendBadRequest(w http.ResponseWriter, description string, l logrus.FieldLog
 	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
 	if err != nil {
 		l.WithError(err).Error("Error encoding json")
-		//todo: empty response?
 	}
 }
 
@@ -69,7 +66,6 @@ func SendBadRequestError(err error, description string, w http.ResponseWriter, l
 	err = json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
 	if err != nil {
 		l.WithError(err).Error("Error encoding json")
-		//todo: empty response?
 	}
 }
 
@@ -79,7 +75,6 @@ func SendInternalError(err error, description string, w http.ResponseWriter, l l
 	err = json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
 	if err != nil {
 		l.WithError(err).Error("Error encoding json")
-		//todo: empty response?
 	}
 }
 

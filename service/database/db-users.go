@@ -20,6 +20,24 @@ func (db *appdbimpl) UserExists(uid string) (bool, error) {
 	return cnt > 0, nil
 }
 
+// User exists and is not banned
+func (db *appdbimpl) UserExistsNotBanned(uid string, requesting_uid string) (bool, error) {
+
+	var cnt int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM "users"
+							WHERE "uid" = ?
+							AND NOT EXISTS (
+								SELECT "bans"."user" FROM "bans"
+								WHERE "bans"."user" = "users"."uid"
+								AND "bans"."ban" = ?
+							)`, uid, requesting_uid).Scan(&cnt)
+
+	if err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
 // Get user id by username
 func (db *appdbimpl) GetUserID(name string) (string, error) {
 	var uid string
@@ -47,7 +65,7 @@ func (db *appdbimpl) UpdateUsername(uid string, name string) error {
 func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
-	exists, err := db.UserExists(uid)
+	exists, err := db.UserExistsNotBanned(uid, requesting_uid)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err
@@ -57,7 +75,7 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 		return ERR_NOT_FOUND, nil, nil
 	}
 
-	rows, err := db.c.Query(`SELECT "follower", "user"."name" FROM "follows", "users"
+	rows, err := db.c.Query(`SELECT "follower", "users"."name" FROM "follows", "users"
 							WHERE "follows"."follower" = "users"."uid"
 							
 							AND "follows"."follower" NOT IN (
@@ -67,8 +85,8 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 							)
 
 							AND "followed" = ?
-							OFFSET ?
-							LIMIT ?`, uid, requesting_uid, start_index, limit)
+							LIMIT ?
+							OFFSET ?`, uid, requesting_uid, limit, start_index)
 
 	followers, err := db.uidNameQuery(rows, err)
 
@@ -83,7 +101,7 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
-	exists, err := db.UserExists(uid)
+	exists, err := db.UserExistsNotBanned(uid, requesting_uid)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err

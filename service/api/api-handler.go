@@ -22,6 +22,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:user_id/bans/:ban_uid", rt.wrap(rt.PutBan))
 	rt.router.DELETE("/users/:user_id/bans/:ban_uid", rt.wrap(rt.DeleteBan))
 
+	rt.router.GET("/users/:user_id/photos", rt.wrap(rt.GetUserPhotos))
 	rt.router.POST("/users/:user_id/photos", rt.wrap(rt.PostPhoto))
 	rt.router.GET("/users/:user_id/photos/:photo_id", rt.wrap(rt.GetPhoto))
 	rt.router.DELETE("/users/:user_id/photos/:photo_id", rt.wrap(rt.DeletePhoto))
@@ -36,7 +37,7 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.GET("/users/:user_id", rt.wrap(rt.GetUserProfile))
 
-	rt.router.GET("/stream", rt.wrap(rt.GetUserStream)) //todo: why not "/users/:user_id/stream"?
+	rt.router.GET("/stream", rt.wrap(rt.GetUserStream))
 
 	rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))

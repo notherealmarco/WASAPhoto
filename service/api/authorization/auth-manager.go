@@ -37,7 +37,7 @@ func SendAuthorizationError(f func(db database.AppDatabase, uid string) (reqcont
 	}
 	// requested user is not found -> 404 as the resource is not found
 	if auth == reqcontext.USER_NOT_FOUND {
-		helpers.SendStatus(notFoundStatus, w, "Resource not found", l)
+		helpers.SendStatus(notFoundStatus, w, "User not found", l)
 		return false
 	}
 	return true

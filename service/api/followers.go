@@ -15,6 +15,10 @@ import (
 
 func (rt *_router) GetFollowersFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	if !authorization.SendErrorIfNotLoggedIn(ctx.Auth.Authorized, rt.db, w, rt.baseLogger) {
+		return
+	}
+
 	uid := ps.ByName("user_id")
 
 	if !helpers.VerifyUserOrNotFound(rt.db, uid, w, rt.baseLogger) {

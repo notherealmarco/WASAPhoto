@@ -42,6 +42,7 @@ import (
 type AppDatabase interface {
 	CreateUser(name string) (string, error)
 	UserExists(uid string) (bool, error)
+	UserExistsNotBanned(uid string, requesting_uid string) (bool, error)
 	GetUserID(name string) (string, error)
 
 	SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error)
@@ -67,7 +68,7 @@ type AppDatabase interface {
 	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
 	GetUserProfile(uid string, requesting_uid string) (QueryResult, *structures.UserProfile, error)
-	GetUserPhotos(uid string, start_index int, limit int) (*[]structures.UserPhoto, error)
+	GetUserPhotos(uid string, requesting_uid string, start_index int, limit int) (*[]structures.UserPhoto, error)
 	GetUserStream(uid string, start_index int, limit int) (*[]structures.Photo, error)
 
 	GetComments(uid string, photo_id int64, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.Comment, error)
