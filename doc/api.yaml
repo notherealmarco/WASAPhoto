@@ -4,9 +4,9 @@ info:
   description: |-
     Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
     upload your photos directly from your PC, and they will be visible to everyone following you.
-  version: "2.0.0"
+  version: "3.0"
 tags:
-  - name: login
+  - name: logins
     description: Login API
   - name: username
     description: Operations related to username
@@ -145,6 +145,7 @@ paths:
               schema:
                 type: array
                 minItems: 0
+                maxItems: 100
                 description: The list of users that the user is following.
                 items:
                   $ref: "#/components/schemas/uid_name"
@@ -324,6 +325,18 @@ paths:
             $ref: "#/components/schemas/photo_id"
           required: true
           description: The ID of the photo.
+        - name: limit
+          in: query
+          schema:
+            $ref: "#/components/schemas/limit"
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            $ref: "#/components/schemas/start_index"
+          description: The starting offset.
+          required: false
       responses:
         '200':
           description: Returns the user list
@@ -332,6 +345,7 @@ paths:
               schema:
                 type: array
                 minItems: 0
+                maxItems: 100
                 description: An array of users liking the photo.
                 items:
                   $ref: "#/components/schemas/uid_name"
@@ -448,13 +462,7 @@ paths:
                 username: "Maria"
                 followers: 25
                 following: 32
-                photos:
-                  - photo_id: 2341
-                    upload_time: "2020-11-20T12:00:00Z"
-                    likes: 2
-                  - photo_id: 2342
-                    upload_time: "2022-10-23T12:01:00Z"
-                    likes: 5
+                photos: 50
         '404':
           description: User not found (or the authorized user is banned).
           content:
@@ -465,6 +473,58 @@ paths:
                 error: "Resource not found"
 
   /users/{user_id}/photos:
+    parameters:
+      - name: user_id
+        in: path
+        schema:
+          $ref: "#/components/schemas/uid"
+        required: true
+        description: The user ID of the user who uploads the photo.
+
+    get:
+      tags: ["photos"]
+      summary: Returns user photos
+      description: Returns the list of photos uploaded by a user.
+      operationId: getUserPhotos
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            $ref: "#/components/schemas/limit"
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            $ref: "#/components/schemas/start_index"
+          description: The starting offset.
+          required: false
+      responses:
+        '200':
+          description: Returns the user photos list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_photo_stream"
+        '404':
+          description: User not found (or the authorized user is banned).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
+        '400':
+          description: Bad request, there is an error in one of the parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Invalid limit or start_index"
+
     post:
       tags: ["photos"]
       summary: Uploads a photo
@@ -472,13 +532,6 @@ paths:
       operationId: uploadPhoto
       security:
         - BearerAuth: []
-      parameters:
-        - name: user_id
-          in: path
-          schema:
-            $ref: "#/components/schemas/uid"
-          required: true
-          description: The user ID of the user who uploads the photo.
       requestBody:
         content:
           image/jpeg:
@@ -589,6 +642,19 @@ paths:
       summary: Gets photo comments
       description: Gets the list of comments of a photo
       operationId: getPhotoComments
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            $ref: "#/components/schemas/limit"
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            $ref: "#/components/schemas/start_index"
+          description: The starting offset.
+          required: false
       security:
         - BearerAuth: []
       responses:
@@ -703,15 +769,13 @@ paths:
           - name: limit
             in: query
             schema:
-              type: integer
-              default: 25
+              $ref: "#/components/schemas/limit"
             description: The number of elements to show.
             required: false
           - name: start_index
             in: query
             schema:
-              type: integer
-              default: 0
+              $ref: "#/components/schemas/start_index"
             description: The starting offset.
             required: false
       responses:
@@ -723,12 +787,12 @@ paths:
                 $ref: "#/components/schemas/photo_stream"
               example:
                 - user_id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
-                - username: "Federicus"
-                - photo_id: 1520
-                - upload_time: "2020-11-20T12:00:00Z"
-                - likes: 93
-
-
+                  username: "Federicus"
+                  photo_id: 157
+                  upload_time: "2020-11-20T12:00:00Z"
+                  likes: 93
+                  comments: 13
+                  liked: true
 
 components:
   securitySchemes:
@@ -737,6 +801,14 @@ components:
       scheme: bearer
 
   schemas:
+    start_index:
+      type: integer
+      description: The starting offset.
+      default: 0
+    limit:
+      type: integer
+      description: The number of elements to show.
+      default: 15
     uid_name:
       type: object
       properties:
@@ -786,6 +858,10 @@ components:
       type: integer
       example: 90
       description: Number of likes.
+    comments_n:
+      type: integer
+      example: 7
+      description: Number of comments on the photo.
     followers_n:
       type: integer
       example: 420
@@ -794,6 +870,14 @@ components:
       type: integer
       example: 69
       description: Number of following users.
+    liked_boolean:
+      type: boolean
+      example: true
+      description: Whether the user liked the photo.
+    photos_n:
+      type: integer
+      example: 90
+      description: Number of photos.
     user_profile:
       type: object
       description: The profile of the user.
@@ -805,10 +889,11 @@ components:
         following:
           $ref: "#/components/schemas/following_n"
         photos:
-          $ref: "#/components/schemas/user_photo_stream"
+          $ref: "#/components/schemas/photos_n"
     user_photo_stream:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of photos, upload time and likes.
       items:
         $ref: "#/components/schemas/user_photo_stream_item"
@@ -821,9 +906,14 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        comments:
+          $ref: "#/components/schemas/comments_n"
+        liked:
+          $ref: "#/components/schemas/liked_boolean"
     photo_stream:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of photos, author, upload time and likes.
       items:
         $ref: "#/components/schemas/photo_stream_item"
@@ -840,9 +930,14 @@ components:
           $ref: "#/components/schemas/upload_time"
         likes:
           $ref: "#/components/schemas/likes"
+        comments:
+          $ref: "#/components/schemas/comments_n"
+        liked:
+          $ref: "#/components/schemas/liked_boolean"
     comments:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of comments.
       items:
         $ref : "#/components/schemas/comment_item"
