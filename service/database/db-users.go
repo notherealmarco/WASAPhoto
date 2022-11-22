@@ -8,20 +8,16 @@ import (
 	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
-//Check if user exists and if exists return the user id by username
-//todo
-
 // Check if user exists
-func (db *appdbimpl) UserExists(uid string) (bool, error) { //todo: refactor code
-	var name string
-	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, uid).Scan(&name)
+func (db *appdbimpl) UserExists(uid string) (bool, error) {
 
-	if db_errors.EmptySet(err) {
-		return false, nil
-	} else if err != nil {
+	var cnt int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM "users" WHERE "uid" = ?`, uid).Scan(&cnt)
+
+	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return cnt > 0, nil
 }
 
 // Get user id by username

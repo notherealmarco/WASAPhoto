@@ -5,10 +5,9 @@ import (
 )
 
 // Get user stream
-// todo implement stidx + offset
 func (db *appdbimpl) GetUserStream(uid string, start_index int, limit int) (*[]structures.Photo, error) {
 
-	// Get photos
+	// Get photos from the database
 	rows, err := db.c.Query(`SELECT "p"."user", "p"."id", "p"."date",
 								(
 									SELECT COUNT(*) AS "likes" FROM "likes" AS "l"

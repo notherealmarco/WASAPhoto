@@ -14,7 +14,7 @@ func BuildAuth(header string) (reqcontext.Authorization, error) {
 	auth, err := BuildBearer(header)
 	if err != nil {
 		if err.Error() == "invalid authorization header" {
-			return nil, errors.New("method not supported") // todo: better error description
+			return nil, errors.New("authentication method not supported")
 		}
 		return nil, err
 	}

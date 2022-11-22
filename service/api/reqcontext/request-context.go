@@ -8,18 +8,8 @@ package reqcontext
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/notherealmarco/WASAPhoto/service/database"
 	"github.com/sirupsen/logrus"
 )
-
-type AuthStatus int
-
-const (
-	AUTHORIZED     = 0
-	UNAUTHORIZED   = 1
-	FORBIDDEN      = 2
-	USER_NOT_FOUND = 3
-) // todo: here?
 
 // RequestContext is the context of the request, for request-dependent parameters
 type RequestContext struct {
@@ -30,11 +20,4 @@ type RequestContext struct {
 	Logger logrus.FieldLogger
 
 	Auth Authorization
-}
-
-type Authorization interface {
-	GetType() string
-	GetUserID() string
-	Authorized(db database.AppDatabase) (AuthStatus, error)
-	UserAuthorized(db database.AppDatabase, uid string) (AuthStatus, error)
 }
