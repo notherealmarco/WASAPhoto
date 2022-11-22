@@ -52,3 +52,20 @@ func (db *appdbimpl) photoExists(uid string, photo int64) (bool, error) {
 	}
 	return cnt > 0, nil
 }
+
+func (db *appdbimpl) PhotoExists(uid string, photo int64, requesting_uid string) (bool, error) {
+
+	var cnt int64
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM "photos"
+							WHERE "id" = ?
+							AND "user" = ?
+							AND "user" NOT IN (
+								SELECT "bans"."user" FROM "bans"
+								WHERE "bans"."user" = "photos"."user"
+								AND "bans"."ban" = ?
+							)`, photo, uid, requesting_uid).Scan(&cnt)
+	if err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}

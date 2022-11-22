@@ -66,8 +66,8 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 							
 							AND "follows"."follower" NOT IN (
 								SELECT "bans"."user" FROM "bans"
-								WHERE "bans"."user" = ?
-								AND "bans"."ban" = "follows"."follower"
+								WHERE "bans"."user" = "follows"."follower"
+								AND "bans"."ban" = ?
 							)
 
 							AND "followed" = ?
@@ -102,13 +102,13 @@ func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_i
 
 							AND "follows"."followed" NOT IN (
 								SELECT "bans"."user" FROM "bans"
-								WHERE "bans"."user" = ?
-								AND "bans"."ban" = "follows"."followed"
+								WHERE "bans"."user" = "follows"."followed"
+								AND "bans"."ban" = ?
 							)
 
 							AND "follower" = ?
-							OFFSET ?
-							LIMIT ?`, uid, requesting_uid, start_index, offset)
+							LIMIT ?
+							OFFSET ?`, uid, requesting_uid, offset, start_index)
 
 	following, err := db.uidNameQuery(rows, err)
 
@@ -237,11 +237,11 @@ func (db *appdbimpl) IsBanned(uid string, banner string) (bool, error) {
 
 func (db *appdbimpl) GetUserBans(uid string, start_index int, limit int) (*[]structures.UIDName, error) {
 
-	rows, err := db.c.Query(`SELECT "ban", "user"."name" FROM "bans", "users"
+	rows, err := db.c.Query(`SELECT "ban", "users"."name" FROM "bans", "users"
 							WHERE "bans"."ban" = "users"."uid"
 							AND "bans"."user" = ?
-							OFFSET ?
-							LIMIT ?`, uid, start_index, limit)
+							LIMIT ?
+							OFFSET ?`, uid, limit, start_index)
 
 	bans, err := db.uidNameQuery(rows, err)
 
@@ -256,15 +256,15 @@ func (db *appdbimpl) GetUserBans(uid string, start_index int, limit int) (*[]str
 func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error) {
 
 	rows, err := db.c.Query(`SELECT "uid", "name" FROM "users"
-							WHERE "name" LIKE ?
+							WHERE "name" LIKE '%' || ? || '%'
 
 							AND "uid" NOT IN (
 								SELECT "bans"."user" FROM "bans"
 								WHERE "bans"."user" = "users"."uid"
 								AND "bans"."ban" = ?
 							)
-							OFFSET ?
-							LIMIT ?`, name, requesting_uid, start_index, limit)
+							LIMIT ?
+							OFFSET ?`, name, requesting_uid, limit, start_index)
 
 	users, err := db.uidNameQuery(rows, err)
 

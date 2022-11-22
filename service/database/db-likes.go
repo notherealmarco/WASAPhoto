@@ -22,12 +22,12 @@ func (db *appdbimpl) GetPhotoLikes(uid string, photo int64, requesting_uid strin
 								WHERE "likes"."photo_id" = ?
 								AND "likes"."user" NOT IN (
 									SELECT "bans"."user" FROM "bans"
-									WHERE "bans"."user" = ?
-									AND "bans"."ban" = "likes"."user"
+									WHERE "bans"."user" = "likes"."user"
+									AND "bans"."ban" = ?
 								)
 								AND "likes"."user" = "users"."uid"
-								OFFSET ?
-								LIMIT ?`, photo, requesting_uid, start_index, limit)
+								LIMIT ?
+								OFFSET ?`, photo, requesting_uid, limit, start_index)
 	if err != nil {
 		return ERR_INTERNAL, nil, err
 	}

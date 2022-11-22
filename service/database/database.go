@@ -60,6 +60,7 @@ type AppDatabase interface {
 
 	PostPhoto(uid string) (DBTransaction, int64, error)
 	DeletePhoto(uid string, photo int64) (bool, error)
+	PhotoExists(uid string, photo int64, requesting_uid string) (bool, error)
 
 	GetPhotoLikes(uid string, photo int64, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error)
 	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)

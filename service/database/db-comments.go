@@ -89,15 +89,17 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 		return ERR_NOT_FOUND, nil, err
 	}
 
-	rows, err := db.c.Query(`SELECT "c"."id", "c"."user", "c"."comment", "c"."date" FROM "comments" AS "c"
+	rows, err := db.c.Query(`SELECT "c"."id", "c"."user", "c"."comment", "c"."date", "u"."name"
+								FROM "comments" AS "c", "users" AS "u"
 								WHERE "c"."photo" = ?
 								AND "c"."user" NOT IN (
 									SELECT "bans"."user" FROM "bans"
-									WHERE "bans"."user" = ?
-									AND "bans"."ban" = "c"."user"
+									WHERE "bans"."user" = "c"."user"
+									AND "bans"."ban" = ?
 								)
-								OFFSET ?
-								LIMIT ?`, photo_id, requesting_uid, start_index, limit)
+								AND "u"."uid" = "c"."user"
+								LIMIT ?
+								OFFSET ?`, photo_id, requesting_uid, limit, start_index)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err
@@ -109,7 +111,7 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 
 	for rows.Next() {
 		var c structures.Comment
-		err = rows.Scan(&c.CommentID, &c.UID, &c.Comment, &c.Date)
+		err = rows.Scan(&c.CommentID, &c.UID, &c.Comment, &c.Date, &c.Name)
 		if err != nil {
 			return ERR_INTERNAL, nil, err
 		}

@@ -26,8 +26,8 @@ func (db *appdbimpl) GetUserStream(uid string, start_index int, limit int) (*[]s
 									SELECT "user" FROM "bans" WHERE "ban" = ?
 								)
 								ORDER BY "p"."date" DESC
-								OFFSET ?
-								LIMIT ?`, uid, uid, start_index, limit)
+								LIMIT ?
+								OFFSET ?`, uid, uid, limit, start_index)
 	if err != nil {
 		// Return the error
 		return nil, err

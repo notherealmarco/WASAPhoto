@@ -15,7 +15,7 @@ import (
 
 func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	defer r.Body.Close()
+	//defer r.Body.Close()
 
 	uid := ps.ByName("user_id")
 
@@ -70,14 +70,35 @@ func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	uid := ps.ByName("user_id")
-	photo_id := ps.ByName("photo_id")
-
-	if !helpers.VerifyUserOrNotFound(rt.db, uid, w, rt.baseLogger) {
+	if !authorization.SendErrorIfNotLoggedIn(ctx.Auth.Authorized, rt.db, w, rt.baseLogger) {
+		// We want the user to be authenticated
 		return
 	}
 
-	path := rt.dataPath + "/photos/" + uid + "/" + photo_id + ".jpg"
+	uid := ps.ByName("user_id")
+
+	photo_id_str := ps.ByName("photo_id")
+	photo_id, err := strconv.ParseInt(photo_id_str, 10, 64)
+
+	if err != nil {
+		helpers.SendBadRequest(w, "Invalid photo id", rt.baseLogger)
+		return
+	}
+
+	// This is also checking if the requesting user is banned by the author of the photo
+	exists, err := rt.db.PhotoExists(uid, photo_id, ctx.Auth.GetUserID())
+
+	if err != nil {
+		helpers.SendInternalError(err, "Database error: PhotoExists", w, rt.baseLogger)
+		return
+	}
+
+	if !exists {
+		helpers.SendNotFound(w, "Resource not found", rt.baseLogger)
+		return
+	}
+
+	path := rt.dataPath + "/photos/" + uid + "/" + photo_id_str + ".jpg"
 
 	file, err := os.Open(path)
 
