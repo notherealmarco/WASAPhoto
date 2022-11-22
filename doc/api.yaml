@@ -73,7 +73,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/generic_response"
               example:
-                error: "Username already taken"
+                status: "Username already taken"
         '404':
           description: The user does not exist.
           content:
@@ -435,6 +435,74 @@ paths:
                 $ref: "#/components/schemas/generic_response"
               example:
                 error: "Resource not found"
+  /users:
+    get:
+      tags: ["search"]
+      summary: Search users by username
+      description: Search users whose username contains the given string.
+      operationId: searchUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          schema:
+            $ref: "#/components/schemas/name"
+          required: true
+          description: The username to search.
+        - name: limit
+          in: query
+          schema:
+            $ref: "#/components/schemas/limit"
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            $ref: "#/components/schemas/start_index"
+          description: The starting offset.
+          required: false
+      responses:
+        '200':
+          description: Returns the user list
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 0
+                maxItems: 100
+                description: An array of users whose username contains the given string.
+                items:
+                  $ref: "#/components/schemas/uid_name"
+              example:
+                - user_id: "123e4567-e89b-12d3-a456-426655440000"
+                  username: "Maria"
+                - user_id: "123e4567-e89b-12d3-a456-426655440001"
+                  username: "Filippo"
+        '404':
+          description: No user found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
+        '400':
+          description: Some parameters are malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Invalid start_index or limit value"
+        '401':
+          description: The user is not logged in.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Unauthorized"
 
   /users/{user_id}:
     get:
