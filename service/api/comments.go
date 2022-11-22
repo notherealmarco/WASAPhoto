@@ -33,8 +33,16 @@ func (rt *_router) GetComments(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// get limits, or use defaults
+	start_index, limit, err := helpers.GetLimits(r.URL.Query())
+
+	if err != nil {
+		helpers.SendBadRequest(w, "Invalid start_index or limit", rt.baseLogger)
+		return
+	}
+
 	// get the user's comments
-	success, comments, err := rt.db.GetComments(uid, photo_id, ctx.Auth.GetUserID())
+	success, comments, err := rt.db.GetComments(uid, photo_id, ctx.Auth.GetUserID(), start_index, limit)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetComments", w, rt.baseLogger)
