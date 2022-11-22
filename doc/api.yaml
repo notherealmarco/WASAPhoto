@@ -71,13 +71,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Username already taken"
         '404':
           description: The user does not exist.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
 
   /users/{user_id}/followers:
     get:
@@ -115,7 +119,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
   /users/{user_id}/following:
     get:
       tags: ["followers"]
@@ -152,7 +158,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
 
   /users/{user_id}/followers/{follower_uid}:
     parameters:
@@ -176,20 +184,38 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '204':
+        '201':
           description: Follow user action successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                status: "Success"
         '403':
           description: The user has no permission perform this action.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Forbidden"
         '404':
-          description: The user does not exist.
+          description: The resource does not exist.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
+        '400':
+          description: Trying to follow a user that does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
     delete:
       tags: ["followers"]
       summary: Unfollows a user
@@ -205,7 +231,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
 
   /users/{user_id}/bans/{ban_uid}:
     parameters:
@@ -236,13 +264,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Forbidden"
         '404':
           description: The user does not exist.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
 
     delete:
       tags: ["bans"]
@@ -259,13 +291,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Forbidden"
         '404':
           description: The user is not banned by the user.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "User not found"
 
   /users/{user_id}/photos/{photo_id}/likes:
     get:
@@ -309,7 +345,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/likes/{liker_uid}:
     parameters:
@@ -346,13 +384,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Forbidden"
         '404':
-          description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
+          description: Resource not found (or the author of the photo has banned the authorized user).
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
+        '400':
+          description: Bad URI (maybe liker_uid is invalid).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Bad photo_id"
     delete:
       tags: ["likes"]
       summary: Unlikes a photo
@@ -368,7 +418,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}:
     get:
@@ -408,7 +460,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}/photos:
     post:
@@ -438,15 +492,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_success"
+                $ref: "#/components/schemas/generic_response"
               example:
-                status: "Created"
+                status: "Resource created"
         '404':
           description: User not found (or the authorized user is banned).
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}:
     parameters:
@@ -484,7 +540,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
     delete:
       tags: ["photos"]
       summary: Deletes a photo
@@ -500,13 +558,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Unauthorized"
         '404':
           description: User or photo not found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/comments:
     parameters:
@@ -540,17 +602,21 @@ paths:
                 - user_id: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
                   name: "Maria"
                   comment: "Nice photo!"
+                  comment_id: 1
                   date: "2020-11-20T12:00:00Z"
                 - user_id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
                   name: "John"
                   comment: "I like it!"
+                  comment_id: 2
                   date: "2021-12-20T13:04:00Z"
         '404':
           description: The user or the photo does not exist.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
     post:
       tags: ["comments"]
       summary: Comments a photo
@@ -574,7 +640,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /users/{user_id}/photos/{photo_id}/comments/{comment_id}:
     delete:
@@ -611,13 +679,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Unauthorized"
         '404':
           description: The comment does not exists.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/generic_error"
+                $ref: "#/components/schemas/generic_response"
+              example:
+                error: "Resource not found"
 
   /stream: # todo review path
     get:
@@ -783,12 +855,16 @@ components:
           $ref: "#/components/schemas/name"
         comment:
           $ref: "#/components/schemas/comment"
+        comment_id:
+          $ref: "#/components/schemas/comment_id"
         date:
           $ref: "#/components/schemas/upload_time"
     comment_request:
       description: The comment to post.
       type: object
       properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
         comment:
           $ref: "#/components/schemas/comment"
     comment:
@@ -798,24 +874,15 @@ components:
       type: string
       example: "What a lovely picture! 😊"
       description: The comment's text
-    
-    generic_error:
-      type: object
-      description: An object representing an error.
-      properties:
-        error:
-          type: string
-          description: The error message.
-          example: "The user does not exist."
 
-    generic_success:
+    generic_response:
       type: object
       description: An object representing a success.
       properties:
         status:
           type: string
           description: The status of the request.
-          example: "Created"
+          example: "Success"
 
   requestBodies:
     userDetails:
