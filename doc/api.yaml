@@ -145,6 +145,7 @@ paths:
               schema:
                 type: array
                 minItems: 0
+                maxItems: 100
                 description: The list of users that the user is following.
                 items:
                   $ref: "#/components/schemas/uid_name"
@@ -344,6 +345,7 @@ paths:
               schema:
                 type: array
                 minItems: 0
+                maxItems: 100
                 description: An array of users liking the photo.
                 items:
                   $ref: "#/components/schemas/uid_name"
@@ -893,6 +895,7 @@ components:
     user_photo_stream:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of photos, upload time and likes.
       items:
         $ref: "#/components/schemas/user_photo_stream_item"
@@ -910,6 +913,7 @@ components:
     photo_stream:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of photos, author, upload time and likes.
       items:
         $ref: "#/components/schemas/photo_stream_item"
@@ -931,6 +935,7 @@ components:
     comments:
       type: array
       minItems: 0
+      maxItems: 100
       description: An array of comments.
       items:
         $ref : "#/components/schemas/comment_item"
