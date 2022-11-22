@@ -324,6 +324,20 @@ paths:
             $ref: "#/components/schemas/photo_id"
           required: true
           description: The ID of the photo.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: The starting offset.
+          required: false
       responses:
         '200':
           description: Returns the user list
@@ -589,6 +603,21 @@ paths:
       summary: Gets photo comments
       description: Gets the list of comments of a photo
       operationId: getPhotoComments
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+          description: The number of elements to show.
+          required: false
+        - name: start_index
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: The starting offset.
+          required: false
       security:
         - BearerAuth: []
       responses:
