@@ -65,7 +65,7 @@ type AppDatabase interface {
 	LikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 	UnlikePhoto(uid string, photo int64, liker_uid string) (QueryResult, error)
 
-	GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error)
+	GetUserProfile(uid string, requesting_uid string) (QueryResult, *structures.UserProfile, error)
 	GetUserPhotos(uid string, start_index int, limit int) (*[]structures.UserPhoto, error)
 	GetUserStream(uid string, start_index int, limit int) (*[]structures.Photo, error)
 

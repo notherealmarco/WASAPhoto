@@ -22,7 +22,7 @@ func (rt *_router) GetUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Get user profile
-	status, profile, err := rt.db.GetUserProfile(uid)
+	status, profile, err := rt.db.GetUserProfile(uid, ctx.Auth.GetUserID())
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetUserProfile", w, rt.baseLogger)

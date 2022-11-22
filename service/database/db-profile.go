@@ -8,7 +8,7 @@ import (
 //this should be changed, but we need to change OpenAPI first
 
 // Get user profile, including username, followers, following, and photos
-func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserProfile, error) {
+func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryResult, *structures.UserProfile, error) {
 	// Get user info
 	var name string
 	err := db.c.QueryRow(`SELECT "name" FROM "users" WHERE "uid" = ?`, uid).Scan(&name)
@@ -46,11 +46,16 @@ func (db *appdbimpl) GetUserProfile(uid string) (QueryResult, *structures.UserPr
 		return ERR_INTERNAL, nil, err
 	}
 
+	// Get follow status
+	var follow_status bool
+	err = db.c.QueryRow(`SELECT EXISTS (SELECT * FROM "follows" WHERE "follower" = ? AND "followed" = ?)`, requesting_uid, uid).Scan(&follow_status)
+
 	return SUCCESS, &structures.UserProfile{
 		UID:       uid,
 		Name:      name,
 		Following: following,
 		Followers: followers,
+		Followed:  follow_status,
 		Photos:    photos,
 	}, nil
 }

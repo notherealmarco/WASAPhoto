@@ -43,5 +43,6 @@ type UserProfile struct {
 	Name      string `json:"name"`
 	Following int64  `json:"following"`
 	Followers int64  `json:"followers"`
+	Followed  bool   `json:"followed"`
 	Photos    int64  `json:"photos"` //todo: check json names
 }
