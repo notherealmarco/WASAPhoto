@@ -40,7 +40,7 @@ func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryRes
 	}
 
 	var photos int64
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM "photos" WHERE "photos"."user" = ?`, uid).Scan(&following)
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM "photos" WHERE "photos"."user" = ?`, uid).Scan(&photos)
 
 	if err != nil {
 		return ERR_INTERNAL, nil, err
