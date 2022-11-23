@@ -258,8 +258,16 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '204':
+        '201':
           description: Ban user action successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                status: "Success"
+        '204':
+          description: The user is already banned.
         '403':
           description: The user has no permission to perform this action.
           content:
@@ -391,8 +399,16 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '204':
+        '201':
           description: Like photo action successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                status: "Success"
+        '204':
+          description: The user already likes the photo.
         '403':
           description: The user has no permission to perform this action.
           content:
@@ -768,8 +784,14 @@ paths:
             example:
               comment: "Lovely!"
       responses:
-        '204':
-          description: Comment photo action successful. #todo maybe 201
+        '201':
+          description: Comment photo action successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/generic_response"
+              example:
+                status: "Created"
         '404':
           description: The user or the photo does not exists (or the author of the photo has banned the authorized user).
           content:
