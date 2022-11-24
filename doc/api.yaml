@@ -943,8 +943,10 @@ components:
       example: 3
     upload_time:
       type: string
-      format: date-time
-      description: Upload time and date.
+      format: RFC3339
+      description: Upload time and date in RFC3339 format.
+      minLength: 25
+      maxLength: 25
     likes:
       type: integer
       example: 90
