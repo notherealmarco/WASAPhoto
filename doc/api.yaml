@@ -107,6 +107,7 @@ paths:
                 type: array
                 description: The list of followers.
                 minItems: 0
+                maxItems: 100
                 items:
                   $ref: "#/components/schemas/uid_name"
               example:
