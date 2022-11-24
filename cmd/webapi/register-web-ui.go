@@ -4,13 +4,14 @@ package main
 
 import (
 	"fmt"
-	//"github.com/notherealmarco/WASAPhoto/webui"
+	"github.com/notherealmarco/WASAPhoto/webui"
 	"io/fs"
 	"net/http"
 	"strings"
 )
 
 func registerWebUI(hdl http.Handler) (http.Handler, error) {
+	fmt.Printf("Registering WebUI...")
 	distDirectory, err := fs.Sub(webui.Dist, "dist")
 	if err != nil {
 		return nil, fmt.Errorf("error embedding WebUI dist/ directory: %w", err)
