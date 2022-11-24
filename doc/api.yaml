@@ -806,7 +806,7 @@ paths:
       tags: ["comments"]
       summary: Deletes a comment
       description: Deletes a photo in the gallery of the authorized user.
-      operationId: deleteComment
+      operationId: uncommentPhoto
       security:
         - BearerAuth: []
       parameters:
