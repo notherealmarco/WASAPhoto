@@ -51,7 +51,7 @@ paths:
       tags: ["username"]
       summary: Updates the username
       description: Changes the username of the user with the given one.
-      operationId: setMyUsername
+      operationId: setMyUserName
       parameters:
         - name: user_id
           in: path
