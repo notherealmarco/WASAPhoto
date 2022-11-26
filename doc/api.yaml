@@ -6,7 +6,7 @@ info:
     upload your photos directly from your PC, and they will be visible to everyone following you.
   version: "3.0"
 tags:
-  - name: logins
+  - name: login
     description: Login API
   - name: username
     description: Operations related to username
