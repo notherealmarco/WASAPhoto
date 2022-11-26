@@ -7,6 +7,7 @@ import (
 	"github.com/notherealmarco/WASAPhoto/service/api/authorization"
 	"github.com/notherealmarco/WASAPhoto/service/api/helpers"
 	"github.com/notherealmarco/WASAPhoto/service/api/reqcontext"
+	"github.com/notherealmarco/WASAPhoto/service/database"
 	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
@@ -21,7 +22,12 @@ func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	err := rt.db.UpdateUsername(uid, req.Name)
+	status, err := rt.db.UpdateUsername(uid, req.Name)
+
+	if status == database.ERR_EXISTS {
+		helpers.SendStatus(http.StatusConflict, w, "Username already exists", rt.baseLogger)
+		return
+	}
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: UpdateUsername", w, rt.baseLogger)

@@ -56,9 +56,18 @@ func (db *appdbimpl) CreateUser(name string) (string, error) {
 }
 
 // Update username
-func (db *appdbimpl) UpdateUsername(uid string, name string) error {
+func (db *appdbimpl) UpdateUsername(uid string, name string) (QueryResult, error) {
 	_, err := db.c.Exec(`UPDATE "users" SET "name" = ? WHERE "uid" = ?`, name, uid)
-	return err
+
+	if db_errors.UniqueViolation(err) {
+		return ERR_EXISTS, nil
+	}
+
+	if err != nil {
+		return ERR_INTERNAL, err
+	}
+
+	return SUCCESS, err
 }
 
 // Get user followers
