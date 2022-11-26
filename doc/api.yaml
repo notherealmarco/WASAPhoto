@@ -37,7 +37,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/userDetails"
       responses:
-        '200': #is 201 in the original one
+        '201':
           description: User log-in action successful.
           content:
             application/json:
@@ -51,7 +51,7 @@ paths:
       tags: ["username"]
       summary: Updates the username
       description: Changes the username of the user with the given one.
-      operationId: setMyUsername
+      operationId: setMyUserName
       parameters:
         - name: user_id
           in: path
@@ -107,6 +107,7 @@ paths:
                 type: array
                 description: The list of followers.
                 minItems: 0
+                maxItems: 100
                 items:
                   $ref: "#/components/schemas/uid_name"
               example:
@@ -944,7 +945,9 @@ components:
     upload_time:
       type: string
       format: date-time
-      description: Upload time and date.
+      description: Upload time and date in RFC3339 format.
+      minLength: 25
+      maxLength: 25
     likes:
       type: integer
       example: 90
@@ -1073,6 +1076,7 @@ components:
       properties:
         status:
           type: string
+          pattern: ".*"
           description: The status of the request.
           example: "Success"
 
