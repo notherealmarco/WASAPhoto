@@ -1064,8 +1064,8 @@ components:
           $ref: "#/components/schemas/comment"
     comment:
       minLength: 5
-      maxLength: 100 #todo think about it
-      pattern: ".*" #everything except newlines
+      maxLength: 255
+      pattern: ".*" #everything except newlines ^[*]{5, 255}$
       type: string
       example: "What a lovely picture! 😊"
       description: The comment's text
