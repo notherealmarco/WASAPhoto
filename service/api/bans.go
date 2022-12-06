@@ -42,7 +42,8 @@ func (rt *_router) GetUserBans(w http.ResponseWriter, r *http.Request, ps httpro
 	// Return ban list
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK) // is it needed?
-	json.NewEncoder(w).Encode(bans)
+
+	err = json.NewEncoder(w).Encode(bans) // write the response
 
 	if err != nil {
 		helpers.SendInternalError(err, "Error encoding json", w, rt.baseLogger)

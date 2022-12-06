@@ -30,7 +30,6 @@ func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httpro
 		uid, err = rt.db.GetUserID(request.Name)
 	}
 	if db_errors.EmptySet(err) { // user does not exist
-		err = nil
 		uid, err = rt.db.CreateUser(request.Name)
 	}
 	if err != nil { // handle any other error
