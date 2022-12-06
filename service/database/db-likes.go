@@ -48,6 +48,10 @@ func (db *appdbimpl) GetPhotoLikes(uid string, photo int64, requesting_uid strin
 		}
 		likes = append(likes, structures.UIDName{UID: uid, Name: name})
 	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return ERR_INTERNAL, nil, err
+	}
 
 	return SUCCESS, &likes, nil
 }

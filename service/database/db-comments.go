@@ -110,8 +110,6 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 		return ERR_INTERNAL, nil, err
 	}
 
-	defer rows.Close()
-
 	comments := make([]structures.Comment, 0)
 
 	defer rows.Close()
@@ -123,6 +121,10 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 			return ERR_INTERNAL, nil, err
 		}
 		comments = append(comments, c)
+	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return ERR_INTERNAL, nil, err
 	}
 
 	return SUCCESS, &comments, nil

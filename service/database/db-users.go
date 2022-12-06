@@ -162,6 +162,11 @@ func (db *appdbimpl) uidNameQuery(rows *sql.Rows, err error) (*[]structures.UIDN
 		}
 		followers = append(followers, structures.UIDName{UID: uid, Name: name})
 	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return &followers, nil
 }
 

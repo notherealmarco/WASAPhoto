@@ -105,6 +105,10 @@ func (db *appdbimpl) GetUserPhotos(uid string, requesting_uid string, start_inde
 		}
 		photos = append(photos, photo)
 	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
 	return &photos, nil
 }

@@ -46,6 +46,10 @@ func (db *appdbimpl) GetUserStream(uid string, start_index int, limit int) (*[]s
 		}
 		photos = append(photos, photo)
 	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
 	return &photos, nil
 }
