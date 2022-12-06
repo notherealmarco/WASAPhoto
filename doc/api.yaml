@@ -625,6 +625,7 @@ paths:
               description: The photo to upload.
               type: string
               format: binary
+              pattern: "(?s).*" # todo: review. Btw this means "any string"
       responses:
         '201':
           description: Upload photo action successful.
@@ -670,7 +671,8 @@ paths:
           content:
             image/jpeg:
               schema:
-                #todo it wants lenght
+                minLength: 1
+                maxLength: 10485760 # Image should not be bigger than 10 MiB
                 description: The requested photo in binary format.
                 type: string
                 format: binary
@@ -849,7 +851,7 @@ paths:
               example:
                 status: "Resource not found"
 
-  /stream: # todo review path
+  /stream:
     get:
       tags: ["stream"]
       summary: Returns user stream
@@ -946,7 +948,7 @@ components:
       type: string
       format: date-time
       description: Upload time and date in RFC3339 format.
-      minLength: 25
+      minLength: 20
       maxLength: 25
     likes:
       type: integer
