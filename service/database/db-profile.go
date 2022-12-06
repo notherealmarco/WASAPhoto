@@ -93,6 +93,8 @@ func (db *appdbimpl) GetUserPhotos(uid string, requesting_uid string, start_inde
 
 	photos := make([]structures.UserPhoto, 0)
 
+	defer rows.Close()
+
 	for rows.Next() {
 		// If there is a next row, we create an instance of Photo and add it to the slice
 		var photo structures.UserPhoto

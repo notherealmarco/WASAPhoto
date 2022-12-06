@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -14,13 +15,23 @@ func (db *appdbimpl) PostPhoto(uid string) (DBTransaction, int64, error) {
 
 	res, err := tx.Exec(`INSERT INTO "photos" ("user", "date") VALUES (?, ?)`, uid, time.Now().Format(time.RFC3339))
 	if err != nil {
-		tx.Rollback() // error ?
+		err_rb := tx.Rollback()
+		// If rollback fails, we return the original error plus the rollback error
+		if err_rb != nil {
+			err = fmt.Errorf("%w; %w", err, err_rb)
+		}
+
 		return nil, 0, err
 	}
 	id, err := res.LastInsertId()
 
 	if err != nil {
-		tx.Rollback() // error ?
+		err_rb := tx.Rollback()
+		// If rollback fails, we return the original error plus the rollback error
+		if err_rb != nil {
+			err = fmt.Errorf("%w; %w", err, err_rb)
+		}
+
 		return nil, 0, err
 	}
 

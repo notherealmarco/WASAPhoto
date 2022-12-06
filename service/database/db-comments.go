@@ -114,6 +114,8 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 
 	comments := make([]structures.Comment, 0)
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var c structures.Comment
 		err = rows.Scan(&c.CommentID, &c.UID, &c.Comment, &c.Date, &c.Name)

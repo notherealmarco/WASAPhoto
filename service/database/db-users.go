@@ -150,6 +150,9 @@ func (db *appdbimpl) uidNameQuery(rows *sql.Rows, err error) (*[]structures.UIDN
 	}
 
 	var followers []structures.UIDName = make([]structures.UIDName, 0)
+
+	defer rows.Close()
+
 	for rows.Next() {
 		var uid string
 		var name string

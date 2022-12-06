@@ -36,6 +36,9 @@ func (db *appdbimpl) GetPhotoLikes(uid string, photo int64, requesting_uid strin
 	}
 
 	likes := make([]structures.UIDName, 0)
+
+	defer rows.Close()
+
 	for rows.Next() {
 		var uid string
 		var name string

@@ -47,7 +47,7 @@ type AppDatabase interface {
 
 	SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error)
 
-	UpdateUsername(uid, name string) (QueryResult, error)
+	UpdateUsername(uid string, name string) (QueryResult, error)
 
 	GetUserFollowers(uid string, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error)
 	GetUserFollowing(uid string, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error)

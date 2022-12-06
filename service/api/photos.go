@@ -15,7 +15,7 @@ import (
 
 func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	//defer r.Body.Close()
+	// defer r.Body.Close()
 
 	uid := ps.ByName("user_id")
 
@@ -109,7 +109,12 @@ func (rt *_router) GetPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	defer file.Close()
 
-	io.Copy(w, file)
+	_, err = io.Copy(w, file)
+
+	if err != nil {
+		helpers.SendInternalError(err, "Error writing response", w, rt.baseLogger)
+		return
+	}
 }
 
 func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -134,7 +139,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		helpers.SendInternalError(err, "Error deleting photo from database", w, rt.baseLogger)
 		return
-	} //todo: maybe let's use a transaction also here
+	} // todo: maybe let's use a transaction also here
 
 	if !deleted {
 		helpers.SendNotFound(w, "Photo not found", rt.baseLogger)

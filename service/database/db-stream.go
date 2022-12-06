@@ -34,6 +34,8 @@ func (db *appdbimpl) GetUserStream(uid string, start_index int, limit int) (*[]s
 
 	photos := make([]structures.Photo, 0)
 
+	defer rows.Close()
+
 	for rows.Next() {
 		// If there is a next row, we create an instance of Photo and add it to the slice
 		var photo structures.Photo
