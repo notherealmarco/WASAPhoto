@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -33,8 +34,16 @@ func (rt *_router) GetComments(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// get limits, or use defaults
+	start_index, limit, err := helpers.GetLimits(r.URL.Query())
+
+	if err != nil {
+		helpers.SendBadRequest(w, "Invalid start_index or limit", rt.baseLogger)
+		return
+	}
+
 	// get the user's comments
-	success, comments, err := rt.db.GetComments(uid, photo_id)
+	success, comments, err := rt.db.GetComments(uid, photo_id, ctx.Auth.GetUserID(), start_index, limit)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetComments", w, rt.baseLogger)
@@ -73,6 +82,22 @@ func (rt *_router) PostComment(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// check if the user is authorized to post a comment
 	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, request_body.UID, rt.db, w, rt.baseLogger, http.StatusBadRequest) {
+		// It returns 400 Bad Request if the user_id field in the request body is missing or an invalid user_id
+		// It returns 401 if the user is not logged in
+		// It returns 403 if the user is not authorized to post a comment as the requested user
+		return
+	}
+
+	// check if the comment is valid (should not contain newlines and at be between 5 and 255 characters)
+	stat, err := regexp.Match(`^[*]{5, 255}$`, []byte(request_body.Comment))
+
+	if err != nil {
+		helpers.SendInternalError(err, "Error matching regex", w, rt.baseLogger)
+		return
+	}
+
+	if !stat {
+		helpers.SendBadRequest(w, "Invalid comment", rt.baseLogger)
 		return
 	}
 

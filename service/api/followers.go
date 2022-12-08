@@ -15,6 +15,10 @@ import (
 
 func (rt *_router) GetFollowersFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	if !authorization.SendErrorIfNotLoggedIn(ctx.Auth.Authorized, rt.db, w, rt.baseLogger) {
+		return
+	}
+
 	uid := ps.ByName("user_id")
 
 	if !helpers.VerifyUserOrNotFound(rt.db, uid, w, rt.baseLogger) {
@@ -25,13 +29,21 @@ func (rt *_router) GetFollowersFollowing(w http.ResponseWriter, r *http.Request,
 	var err error
 	var status database.QueryResult
 
+	// Get limits, or use default values
+	start_index, limit, err := helpers.GetLimits(r.URL.Query())
+
+	if err != nil {
+		helpers.SendBadRequest(w, "Invalid start_index or limit", rt.baseLogger)
+		return
+	}
+
 	// Check if client is asking for followers or following
 	if strings.HasSuffix(r.URL.Path, "/followers") {
 		// Get the followers from the database
-		status, users, err = rt.db.GetUserFollowers(uid)
+		status, users, err = rt.db.GetUserFollowers(uid, ctx.Auth.GetUserID(), start_index, limit)
 	} else {
 		// Get the following users from the database
-		status, users, err = rt.db.GetUserFollowing(uid)
+		status, users, err = rt.db.GetUserFollowing(uid, ctx.Auth.GetUserID(), start_index, limit)
 	}
 
 	// Send a 500 response if there was an error

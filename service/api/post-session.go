@@ -23,14 +23,13 @@ type _respbody struct {
 func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var request _reqbody
-	err := json.NewDecoder(r.Body).Decode(&request) //todo: capire se serve close
+	err := json.NewDecoder(r.Body).Decode(&request)
 
 	var uid string
 	if err == nil { // test if user exists
 		uid, err = rt.db.GetUserID(request.Name)
 	}
 	if db_errors.EmptySet(err) { // user does not exist
-		err = nil
 		uid, err = rt.db.CreateUser(request.Name)
 	}
 	if err != nil { // handle any other error

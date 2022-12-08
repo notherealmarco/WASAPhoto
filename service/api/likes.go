@@ -14,6 +14,10 @@ import (
 
 func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
+	if !authorization.SendErrorIfNotLoggedIn(ctx.Auth.Authorized, rt.db, w, rt.baseLogger) {
+		return
+	}
+
 	// get the user id from the url
 	uid := ps.ByName("user_id")
 	photo_id, err := strconv.ParseInt(ps.ByName("photo_id"), 10, 64)
@@ -23,13 +27,21 @@ func (rt *_router) GetLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
+	// get limits, or use defaults
+	start_index, limit, err := helpers.GetLimits(r.URL.Query())
+
+	if err != nil {
+		helpers.SendBadRequest(w, "Invalid start_index or limit", rt.baseLogger)
+		return
+	}
+
 	// send 404 if the user does not exist
 	if !helpers.VerifyUserOrNotFound(rt.db, uid, w, rt.baseLogger) {
 		return
 	}
 
 	// get the user's likes
-	success, likes, err := rt.db.GetPhotoLikes(uid, photo_id)
+	success, likes, err := rt.db.GetPhotoLikes(uid, photo_id, ctx.Auth.GetUserID(), start_index, limit)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: GetLikes", w, rt.baseLogger)
