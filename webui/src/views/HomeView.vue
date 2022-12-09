@@ -4,7 +4,8 @@ export default {
 		return {
 			errormsg: null,
 			loading: false,
-			some_data: null,
+			stream_data: null,
+			my_id: sessionStorage.getItem("token"),
 		}
 	},
 	methods: {
@@ -12,12 +13,16 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
+				let response = await this.$axios.get("/stream");
+				this.stream_data = response.data;
+				this.errormsg = this.stream_data; // TODO: temporary
+				this.loading = false;
 			} catch (e) {
+				if (e.response.status == 401) {
+					this.$router.push({ path: "/login" });
+				}
 				this.errormsg = e.toString();
 			}
-			this.loading = false;
 		},
 	},
 	mounted() {
@@ -48,7 +53,28 @@ export default {
 			</div>
 		</div>
 
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<div class="container">
+			<div class="row justify-content-md-center">
+				<div class="col-xl-6 col-lg-9">
+
+					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+
+					<div id="main-content" v-for="item of stream_data">
+						<PostCard :user_id="item.user_id"
+									:photo_id="item.photo_id"
+									:name="item.name"
+									:date="item.date"
+									:comments="item.comments"
+									:likes="item.likes"
+									:liked="item.liked"
+									:my_id="my_id" />
+					</div>
+
+					<LoadingSpinner :loading="loading" /><br />
+				</div>
+			</div>
+		</div>
+
 	</div>
 </template>
 

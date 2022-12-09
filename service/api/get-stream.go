@@ -32,7 +32,7 @@ func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps http
 	stream, err := rt.db.GetUserStream(uid, start_index, limit)
 
 	if err != nil {
-		helpers.SendInternalError(err, "Database error: GetUserProfile", w, rt.baseLogger)
+		helpers.SendInternalError(err, "Database error: GetUserStream", w, rt.baseLogger)
 		return
 	}
 

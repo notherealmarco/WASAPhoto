@@ -23,6 +23,7 @@ type Comment struct {
 
 type Photo struct {
 	UID      string `json:"user_id"`
+	Username string `json:"name"`
 	ID       int64  `json:"photo_id"`
 	Likes    int64  `json:"likes"`
 	Comments int64  `json:"comments"`
