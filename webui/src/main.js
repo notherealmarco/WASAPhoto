@@ -5,6 +5,7 @@ import { axios, updateToken as axiosUpdate } from './services/axios.js';
 import ErrorMsg from './components/ErrorMsg.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import PostCard from './components/PostCard.vue'
+import UserCard from './components/UserCard.vue'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import './assets/dashboard.css'
@@ -16,5 +17,6 @@ app.config.globalProperties.$axiosUpdate = axiosUpdate;
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("PostCard", PostCard);
+app.component("UserCard", UserCard);
 app.use(router)
 app.mount('#app')

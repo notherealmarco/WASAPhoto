@@ -72,14 +72,14 @@ func (rt *_router) GetFollowersFollowing(w http.ResponseWriter, r *http.Request,
 func (rt *_router) PutFollow(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("user_id")
-	followed := ps.ByName("follower_uid")
+	follower := ps.ByName("follower_uid")
 
 	// send error if the user has no permission to perform this action
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, follower, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 
-	status, err := rt.db.FollowUser(uid, followed)
+	status, err := rt.db.FollowUser(follower, uid)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: FollowUser", w, rt.baseLogger)
@@ -102,14 +102,14 @@ func (rt *_router) PutFollow(w http.ResponseWriter, r *http.Request, ps httprout
 func (rt *_router) DeleteFollow(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	uid := ps.ByName("user_id")
-	followed := ps.ByName("follower_uid")
+	follower := ps.ByName("follower_uid")
 
 	// send error if the user has no permission to perform this action
-	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, uid, rt.db, w, rt.baseLogger, http.StatusNotFound) {
+	if !authorization.SendAuthorizationError(ctx.Auth.UserAuthorized, follower, rt.db, w, rt.baseLogger, http.StatusNotFound) {
 		return
 	}
 
-	status, err := rt.db.UnfollowUser(uid, followed)
+	status, err := rt.db.UnfollowUser(follower, uid)
 
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: UnfollowUser", w, rt.baseLogger)
