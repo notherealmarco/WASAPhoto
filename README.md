@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/notherealmarco/wasaphoto/badge?s=2a99529eb3b66797b3a0cae48a39232782ae6c1b)](https://www.codefactor.io/repository/github/notherealmarco/wasaphoto)
+
 # WASAPhoto
 
 *Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto!*
