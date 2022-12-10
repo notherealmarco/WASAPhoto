@@ -45,7 +45,7 @@ paths:
                 $ref: "#/components/schemas/uid_object"
               example:
                 user_id: "123e4567-e89b-12d3-a456-426655440000"
-  
+
   /users/{user_id}/username:
     put:
       tags: ["username"]
