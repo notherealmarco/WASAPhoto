@@ -490,12 +490,16 @@ paths:
                 maxItems: 100
                 description: An array of users whose username contains the given string.
                 items:
-                  $ref: "#/components/schemas/uid_name"
+                  $ref: "#/components/schemas/search_result"
               example:
                 - user_id: "123e4567-e89b-12d3-a456-426655440000"
                   name: "Maria"
+                  followed: false
+                  banned: false
                 - user_id: "123e4567-e89b-12d3-a456-426655440001"
                   name: "Filippo"
+                  followed: true
+                  banned: false
         '404':
           description: No user found.
           content:
@@ -974,10 +978,25 @@ components:
       type: boolean
       example: false
       description: Whether the user follows the other user.
+    ban_status:
+      type: boolean
+      example: false
+      description: Whether the user banned the other user.
     photos_n:
       type: integer
       example: 90
       description: Number of photos.
+    search_result:
+      type: object
+      properties:
+        user_id:
+          $ref: "#/components/schemas/uid"
+        name:
+          $ref: "#/components/schemas/name"
+        followed:
+          $ref: "#/components/schemas/follow_status"
+        banned:
+          $ref: "#/components/schemas/ban_status"
     user_profile:
       type: object
       description: The profile of the user.
