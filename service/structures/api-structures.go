@@ -9,6 +9,13 @@ type UIDName struct {
 	Name string `json:"name"`
 }
 
+type SearchResult struct {
+	UID  string `json:"user_id"`
+	Name string `json:"name"`
+	Followed bool `json:"followed"`
+	Banned bool `json:"banned"`
+}
+
 type GenericResponse struct {
 	Status string `json:"status"`
 }

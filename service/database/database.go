@@ -45,7 +45,7 @@ type AppDatabase interface {
 	UserExistsNotBanned(uid string, requesting_uid string) (bool, error)
 	GetUserID(name string) (string, error)
 
-	SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error)
+	SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.SearchResult, error)
 
 	UpdateUsername(uid string, name string) (QueryResult, error)
 

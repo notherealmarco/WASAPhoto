@@ -284,9 +284,25 @@ func (db *appdbimpl) GetUserBans(uid string, start_index int, limit int) (*[]str
 }
 
 // Search by name
-func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.UIDName, error) {
+func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_index int, limit int) (*[]structures.SearchResult, error) {
 
-	rows, err := db.c.Query(`SELECT "uid", "name" FROM "users"
+	rows, err := db.c.Query(`SELECT "uid", "name",
+							(
+								SELECT EXISTS(
+									SELECT * FROM "follows" AS "f"
+									WHERE "f"."follower" = "users"."uid"
+									AND "f"."followed" = ?
+								)
+							),
+							(
+								SELECT EXISTS(
+									SELECT * FROM "bans" AS "b"
+									WHERE "b"."user" = "users"."uid"
+									AND "b"."ban" = ?
+								)
+							)
+	
+							FROM "users"
 							WHERE "name" LIKE '%' || ? || '%'
 
 							AND "uid" NOT IN (
@@ -295,13 +311,28 @@ func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_inde
 								AND "bans"."ban" = ?
 							)
 							LIMIT ?
-							OFFSET ?`, name, requesting_uid, limit, start_index)
-
-	users, err := db.uidNameQuery(rows, err)
+							OFFSET ?`, requesting_uid, requesting_uid, name, requesting_uid, limit, start_index)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	var search_data []structures.SearchResult = make([]structures.SearchResult, 0)
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var search_entry structures.SearchResult
+		err = rows.Scan(&search_entry.UID, &search_entry.Name, &search_entry.Followed, &search_entry.Banned)
+		if err != nil {
+			return nil, err
+		}
+		search_data = append(search_data, search_entry)
+	}
+	// We check if the iteration ended prematurely
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &search_data, nil
 }
