@@ -97,13 +97,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if tables exist. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName) //todo: check for all the tables
+	//todo: check for all the tables, not just users
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE "users" (
 			"uid"	TEXT NOT NULL,
 			"name"	TEXT NOT NULL UNIQUE,
 			PRIMARY KEY("uid")
-		)` //todo: one query is enough! Why do I need to do this?
+		)` // todo: one query is enough! We are we doing a query per table?
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
