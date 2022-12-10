@@ -13,8 +13,8 @@ This is my project for the Web And Software Architecture (WASA) class
 ### This project includes
 
 * An API specification using the OpenAPI standard
-* ~~A backend written in the Go language~~
-* ~~A frontend written in JavaScript using the Vue.js framework~~
+* A backend written in the Go language
+* A frontend in Vue.js
 * ~~A Dockerfile to build a Docker image to deploy the project in a container.~~
 
 *(Strikethrough parts are work in progress or still need to be implemented)*
