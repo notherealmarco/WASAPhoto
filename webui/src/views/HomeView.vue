@@ -56,29 +56,18 @@ export default {
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Home page</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
-						Refresh
-					</button>
-				</div>
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-primary" @click="newPost">
-						New
-					</button>
-				</div>
-			</div>
-		</div>
-
+	<div class="mt-4">
 		<div class="container">
 			<div class="row justify-content-md-center">
 				<div class="col-xl-6 col-lg-9">
+					<h3 class="card-title border-bottom mb-4 pb-2 text-center">Your daily WASAStream!</h3>
 
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+
+					<div v-if="(stream_data.length == 0)" class="alert alert-secondary text-center" role="alert">
+						There's nothing here 😢
+						<br />Why don't you start following somebody? 👻
+					</div>
 
 					<div id="main-content" v-for="item of stream_data">
 						<PostCard :user_id="item.user_id"
@@ -92,7 +81,7 @@ export default {
 					</div>
 
 					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">
-						Hai visualizzato tutti i post. Hooray! 👻
+						This is the end of your stream. Hooray! 👻
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />

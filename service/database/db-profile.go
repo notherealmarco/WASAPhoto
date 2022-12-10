@@ -83,7 +83,7 @@ func (db *appdbimpl) GetUserPhotos(uid string, requesting_uid string, start_inde
 								)
  								FROM "photos" AS "p"
 								WHERE "p"."user" = ?
-								
+								ORDER BY "p"."date" DESC
 								LIMIT ?
 								OFFSET ?`, requesting_uid, uid, limit, start_index)
 	if err != nil {

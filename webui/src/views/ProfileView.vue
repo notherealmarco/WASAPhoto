@@ -85,7 +85,8 @@ export default {
                                 :banned = "user_data['banned']"
                                 :my_id = "my_id"
                                 :show_new_post = "true"
-                                @updateInfo = "getMainData" />
+                                @updateInfo = "getMainData"
+                                @updatePosts = "refresh" />
                     
                     <div class="row text-center mt-2 mb-3">
                         <div class="col-4" style="border-right: 1px">

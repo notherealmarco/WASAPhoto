@@ -32,9 +32,6 @@ export default {
 				let response = await this.$axios.get("/users?query=" + this.field_username + "&start_index=" + this.start_idx + "&limit=" + this.limit);
 				if (response.data.length == 0) this.data_ended = true;
 				else this.stream_data = this.stream_data.concat(response.data);
-
-				this.errormsg = this.stream_data; // todo: temoprary
-
 				this.loading = false;
 			} catch (e) {
 				this.errormsg = e.toString();
@@ -59,21 +56,17 @@ export default {
 		// todo: may not work in 4k screens :/
 		this.limit = Math.round(window.innerHeight / 72);
 		this.scroll();
-		this.loadContent();
 	}
 }
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Search</h1>
-		</div>
-
+	<div class="mt-4">
 		<div class="container">
 			<div class="row justify-content-md-center">
 				<div class="col-xl-6 col-lg-9">
+
+					<h3 class="card-title border-bottom mb-4 pb-2 text-center">WASASearch</h3>
 
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
