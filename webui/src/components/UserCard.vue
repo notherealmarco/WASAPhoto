@@ -5,7 +5,7 @@ export default {
 	data: function() {
 		return {
 			errorMsg: "aaa",
-			user_followed: this.post_followed,
+			user_followed: this.followed,
 			user_banned: this.banned,
             myself: this.my_id == this.user_id,
             show_post_form: false,
@@ -43,7 +43,7 @@ export default {
 		unban() {
 			this.$axios.delete("/users/" + this.my_id + "/bans/" + this.user_id)
             .then(response => {
-                this.user_banned = true
+                this.user_banned = false
                 this.$emit('updateInfo')
             })
             .catch(error => alert(error.toString()));

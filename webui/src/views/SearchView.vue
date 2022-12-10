@@ -76,7 +76,12 @@ export default {
                     </div>
 
 					<div id="main-content" v-for="item of stream_data">
-						<UserCard :user_id="item.user_id" :name="item.name" :my_id="my_id" />
+						<UserCard
+								:user_id="item.user_id"
+								:name="item.name"
+								:followed="item.followed"
+								:banned="item.banned"
+								:my_id="my_id" />
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
