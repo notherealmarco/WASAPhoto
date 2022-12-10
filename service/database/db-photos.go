@@ -18,7 +18,8 @@ func (db *appdbimpl) PostPhoto(uid string) (DBTransaction, int64, error) {
 		err_rb := tx.Rollback()
 		// If rollback fails, we return the original error plus the rollback error
 		if err_rb != nil {
-			err = fmt.Errorf("%w; %w", err, err_rb)
+			// todo: we are losing track of err_rb here
+			err = fmt.Errorf("Rollback error. Rollback cause: %w", err)
 		}
 
 		return nil, 0, err
@@ -29,7 +30,8 @@ func (db *appdbimpl) PostPhoto(uid string) (DBTransaction, int64, error) {
 		err_rb := tx.Rollback()
 		// If rollback fails, we return the original error plus the rollback error
 		if err_rb != nil {
-			err = fmt.Errorf("%w; %w", err, err_rb)
+			// todo: we are losing track of err_rb here
+			err = fmt.Errorf("Rollback error. Rollback cause: %w", err)
 		}
 
 		return nil, 0, err
