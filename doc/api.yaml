@@ -624,12 +624,9 @@ paths:
         - BearerAuth: []
       requestBody:
         content:
-          image/jpeg:
+          image/jpg:
             schema:
-              description: The photo to upload.
-              type: string
-              format: binary
-              pattern: "(?s).*" # todo: review. Btw this means "any string"
+              $ref: "#/components/schemas/image_jpg"
       responses:
         '201':
           description: Upload photo action successful.
@@ -673,13 +670,10 @@ paths:
         '200':
           description: The requested photo in binary format.
           content:
-            image/jpeg:
+            image/jpg:
               schema:
-                minLength: 1
-                maxLength: 10485760 # Image should not be bigger than 10 MiB
-                description: The requested photo in binary format.
-                type: string
-                format: binary
+                $ref: "#/components/schemas/image_jpg"
+
         '404':
           description: User or photo not found (or the authorized user is banned by the author of the photo).
           content:
@@ -1090,6 +1084,13 @@ components:
       type: string
       example: "What a lovely picture! 😊"
       description: The comment's text
+    image_jpg:
+      description: The photo to upload.
+      type: string
+      format: binary
+      minLength: 1
+      maxLength: 10485760 # 10 MB
+      pattern: "((.|\n)*)" # todo: review. Btw this means "any string"
 
     generic_response:
       type: object
@@ -1097,6 +1098,8 @@ components:
       properties:
         status:
           type: string
+          minLength: 1
+          maxLength: 255
           pattern: ".*"
           description: The status of the request.
           example: "Success"
