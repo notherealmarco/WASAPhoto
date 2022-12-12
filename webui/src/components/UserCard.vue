@@ -20,9 +20,17 @@ export default {
             show_username_form: false,
             newUsername: "",
             upload_file: null,
+
+            modalTitle: "",
+            modalMsg: "",
 		}
 	},
 	methods: {
+        playModal(title, msg) {
+            this.modalTitle = title
+            this.modalMsg = msg
+            this.$refs.openModal.click()
+        },
         logout() {
             localStorage.removeItem("token");
             sessionStorage.removeItem("token");
@@ -37,7 +45,7 @@ export default {
                 this.user_followed = true
                 this.$emit('updateInfo')
             })
-            .catch(error => alert(error.toString()));
+            .catch(error => this.playModal("Error", error.toString()));
 		},
 		unfollow() {
 			this.$axios.delete("/users/" + this.user_id + "/followers/" + getCurrentSession())
@@ -45,7 +53,7 @@ export default {
                 this.user_followed = false
                 this.$emit('updateInfo')
             })
-            .catch(error => alert(error.toString()));
+            .catch(error => this.playModal("Error", error.toString()));
 		},
 		ban() {
 			this.$axios.put("/users/" + getCurrentSession() + "/bans/" + this.user_id)
@@ -53,7 +61,7 @@ export default {
                 this.user_banned = true
                 this.$emit('updateInfo')
             })
-            .catch(error => alert(error.toString()));
+            .catch(error => this.playModal("Error", error.toString()));
 		},
 		unban() {
 			this.$axios.delete("/users/" + getCurrentSession() + "/bans/" + this.user_id)
@@ -61,7 +69,7 @@ export default {
                 this.user_banned = false
                 this.$emit('updateInfo')
             })
-            .catch(error => alert(error.toString()));
+            .catch(error => this.playModal("Error", error.toString()));
 		},
         load_file(e) {
             let files = e.target.files || e.dataTransfer.files;
@@ -74,7 +82,16 @@ export default {
                 this.show_post_form = false
                 this.$emit('updatePosts')
             })
-            .catch(error => alert(error.toString()));
+            .catch(error => {
+                if (error.response.status != null && error.response.data != null) {
+                    this.modalTitle = "Error"
+                    this.modalMsg = error.response.data
+                    this.$refs.openModal.click()
+                } else {
+                    this.playModal("Error", error.toString())
+                }
+                this.playModal("Error", error.toString())
+            });
         },
         updateUsername() {
             this.$axios.put("/users/" + getCurrentSession() + "/username", {name: this.newUsername})
@@ -85,9 +102,11 @@ export default {
             })
             .catch(error => {
                 if (error.response.status == 409) {
+                    this.modalTitle = "Error"
+                    this.modalMsg = "The chosen username is already taken."
                     this.$refs.openModal.click()
                 } else {
-                    alert(error.toString())
+                    this.playModal("Error", error.toString())
                 }
             });
         },
@@ -97,6 +116,10 @@ export default {
 }
 </script>
 <template>
+
+    <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#modal" />
+    <Modal :title="modalTitle" :message="modalMsg" />
+
     <div class="card mb-3">
 		<div class="container">
 			<div class="row">
@@ -143,8 +166,6 @@ export default {
                 </div>
             </div>
             <div class="row" v-if="show_username_form">
-                <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#modal" />
-                <Modal title="Error" message="The chosen username is already taken" />
 				<div class="col-10">
 					<div class="card-body h-100 d-flex align-items-center">
                         <input v-model="newUsername" class="form-control form-control-lg" id="formUsername" placeholder="Your new fantastic username! 😜" />
