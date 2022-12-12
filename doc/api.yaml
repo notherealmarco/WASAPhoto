@@ -1005,6 +1005,8 @@ components:
           $ref: "#/components/schemas/photos_n"
         followed:
           $ref: "#/components/schemas/follow_status"
+        banned:
+          $ref: "#/components/schemas/ban_status"
     user_photo_stream:
       type: array
       minItems: 0

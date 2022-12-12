@@ -290,15 +290,15 @@ func (db *appdbimpl) SearchByName(name string, requesting_uid string, start_inde
 							(
 								SELECT EXISTS(
 									SELECT * FROM "follows" AS "f"
-									WHERE "f"."follower" = "users"."uid"
-									AND "f"."followed" = ?
+									WHERE "f"."follower" = ?
+									AND "f"."followed" = "users"."uid"
 								)
 							),
 							(
 								SELECT EXISTS(
 									SELECT * FROM "bans" AS "b"
-									WHERE "b"."user" = "users"."uid"
-									AND "b"."ban" = ?
+									WHERE "b"."user" = ?
+									AND "b"."ban" = "users"."uid"
 								)
 							)
 	

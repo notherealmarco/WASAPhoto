@@ -10,10 +10,10 @@ type UIDName struct {
 }
 
 type SearchResult struct {
-	UID  string `json:"user_id"`
-	Name string `json:"name"`
-	Followed bool `json:"followed"`
-	Banned bool `json:"banned"`
+	UID      string `json:"user_id"`
+	Name     string `json:"name"`
+	Followed bool   `json:"followed"`
+	Banned   bool   `json:"banned"`
 }
 
 type GenericResponse struct {
@@ -52,5 +52,6 @@ type UserProfile struct {
 	Following int64  `json:"following"`
 	Followers int64  `json:"followers"`
 	Followed  bool   `json:"followed"`
+	Banned    bool   `json:"banned"`
 	Photos    int64  `json:"photos"`
 }

@@ -54,12 +54,21 @@ func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryRes
 		return ERR_INTERNAL, nil, err
 	}
 
+	// Get ban status
+	var ban_status bool
+	err = db.c.QueryRow(`SELECT EXISTS (SELECT * FROM "bans" WHERE "user" = ? AND "ban" = ?)`, requesting_uid, uid).Scan(&ban_status)
+
+	if err != nil {
+		return ERR_INTERNAL, nil, err
+	}
+
 	return SUCCESS, &structures.UserProfile{
 		UID:       uid,
 		Name:      name,
 		Following: following,
 		Followers: followers,
 		Followed:  follow_status,
+		Banned:    ban_status,
 		Photos:    photos,
 	}, nil
 }

@@ -2,6 +2,14 @@
 
 export default {
 	props: ["user_id", "name", "followed", "banned", "my_id", "show_new_post"],
+    watch: { 
+        banned: function(new_val, old_val) {
+          this.user_banned = new_val;
+        },
+        followed: function(new_val, old_val) {
+          this.user_followed = new_val;
+        },
+    },
 	data: function() {
 		return {
 			errorMsg: "aaa",
@@ -63,7 +71,6 @@ export default {
         },
 	},
     created() {
-
     },
 }
 </script>
