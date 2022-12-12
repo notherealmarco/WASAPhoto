@@ -34,7 +34,7 @@ RUN /bin/bash -euo pipefail -c "for ex in \$(ls); do pushd \$ex; CGO_ENABLED=1 g
 RUN cd /app/ && strip * && upx -9 *
 
 ### Create final container from scratch
-FROM debian:latest
+FROM scratch
 
 ### Inform Docker about which port is used
 EXPOSE 3000 4000
