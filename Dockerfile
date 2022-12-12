@@ -34,7 +34,7 @@ RUN /bin/bash -euo pipefail -c "for ex in \$(ls); do pushd \$ex; CGO_ENABLED=1 g
 RUN cd /app/ && strip * && upx -9 *
 
 ### Create final container from scratch
-FROM scratch
+FROM debian:latest
 
 ### Inform Docker about which port is used
 EXPOSE 3000 4000
@@ -59,7 +59,7 @@ ARG GROUP_NAME
 USER appuser
 
 ### Executable command
-CMD ["/app/webapi", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]
+CMD ["/app/webapi ", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]
 
 ### OpenContainers tags
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
