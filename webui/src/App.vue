@@ -4,28 +4,6 @@ import getCurrentSession from './services/authentication';
 import { updateToken } from './services/axios';
 </script>
 
-<script>
-export default {
-	data() {
-		return {
-			currentSession: "",
-		}
-	},
-	created() {
-		if (!this.getCurrentSession()) {
-			this.$router.push({ path: "/login" });
-		} else {
-			updateToken()
-		}
-	},
-	computed: {
-    linkTo() {
-      return "/profile/" + this.getCurrentSession();
-    }
-  }
-}
-</script>
-
 <template>
 
 	<!--<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">

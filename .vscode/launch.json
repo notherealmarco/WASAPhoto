@@ -10,7 +10,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "buildFlags": "",
+            "buildFlags": "-tags webui",
             "program": "./cmd/webapi",
             "args": [
                 "--db-filename", "/home/marco/wasa/wasadata/wasaphoto.db", "--data-path", "/home/marco/wasa/wasadata/data"
