@@ -59,7 +59,7 @@ ARG GROUP_NAME
 USER appuser
 
 ### Executable command
-CMD ["/app/webapi ", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]
+CMD ["/app/webapi", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]
 
 ### OpenContainers tags
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
