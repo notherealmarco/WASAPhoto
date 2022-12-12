@@ -1,7 +1,7 @@
 <script>
-
+import getCurrentSession from '../services/authentication';
 export default {
-	props: ["user_id", "name", "followed", "banned", "my_id", "show_new_post"],
+	props: ["user_id", "name", "followed", "banned", "show_new_post"],
     watch: { 
         banned: function(new_val, old_val) {
           this.user_banned = new_val;
@@ -15,17 +15,24 @@ export default {
 			errorMsg: "aaa",
 			user_followed: this.followed,
 			user_banned: this.banned,
-            myself: this.my_id == this.user_id,
+            myself: getCurrentSession() == this.user_id,
             show_post_form: false,
+            show_username_form: false,
+            newUsername: "",
             upload_file: null,
 		}
 	},
 	methods: {
+        logout() {
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("token");
+            this.$router.push({ path: "/login" });
+        },
         visit() {
             this.$router.push({ path: "/profile/" + this.user_id });
         },
 		follow() {
-			this.$axios.put("/users/" + this.user_id + "/followers/" + this.my_id)
+			this.$axios.put("/users/" + this.user_id + "/followers/" + getCurrentSession())
             .then(response => {
                 this.user_followed = true
                 this.$emit('updateInfo')
@@ -33,7 +40,7 @@ export default {
             .catch(error => alert(error.toString()));
 		},
 		unfollow() {
-			this.$axios.delete("/users/" + this.user_id + "/followers/" + this.my_id)
+			this.$axios.delete("/users/" + this.user_id + "/followers/" + getCurrentSession())
             .then(response => {
                 this.user_followed = false
                 this.$emit('updateInfo')
@@ -41,7 +48,7 @@ export default {
             .catch(error => alert(error.toString()));
 		},
 		ban() {
-			this.$axios.put("/users/" + this.my_id + "/bans/" + this.user_id)
+			this.$axios.put("/users/" + getCurrentSession() + "/bans/" + this.user_id)
             .then(response => {
                 this.user_banned = true
                 this.$emit('updateInfo')
@@ -49,7 +56,7 @@ export default {
             .catch(error => alert(error.toString()));
 		},
 		unban() {
-			this.$axios.delete("/users/" + this.my_id + "/bans/" + this.user_id)
+			this.$axios.delete("/users/" + getCurrentSession() + "/bans/" + this.user_id)
             .then(response => {
                 this.user_banned = false
                 this.$emit('updateInfo')
@@ -62,22 +69,35 @@ export default {
             this.upload_file = files[0];
         },
         submit_file() {
-            this.$axios.post("/users/" + this.my_id + "/photos", this.upload_file)
+            this.$axios.post("/users/" + getCurrentSession() + "/photos", this.upload_file)
             .then(response => {
                 this.show_post_form = false
                 this.$emit('updatePosts')
             })
             .catch(error => alert(error.toString()));
         },
+        updateUsername() {
+            this.$axios.put("/users/" + getCurrentSession() + "/username", {name: this.newUsername})
+            .then(response => {
+                this.show_username_form = false
+                this.$emit('updateInfo')
+                this.name = this.newUsername
+            })
+            .catch(error => {
+                if (error.response.status == 409) {
+                    this.$refs.openModal.click()
+                } else {
+                    alert(error.toString())
+                }
+            });
+        },
 	},
     created() {
     },
 }
 </script>
-
 <template>
     <div class="card mb-3">
-
 		<div class="container">
 			<div class="row">
 				<div class="col-10">
@@ -98,6 +118,12 @@ export default {
                             <button disabled type="button" class="btn btn-secondary">Yourself</button>
                         </div>
                         <div v-if="(myself && show_new_post)" class="d-flex">
+                            <button type="button" class="btn btn-outline-danger me-2" @click="logout">Logout</button>                           
+                        </div>
+                        <div v-if="(myself && show_new_post)" class="d-flex">
+                            <button v-if="!show_username_form" type="button" class="btn btn-outline-secondary me-2" @click="show_username_form = true">Username</button>                           
+                        </div>
+                        <div v-if="(myself && show_new_post)" class="d-flex">
                             <button v-if="!show_post_form" type="button" class="btn btn-primary" @click="show_post_form = true">Post</button>                            
                         </div>
                     </div>
@@ -113,6 +139,21 @@ export default {
 				<div class="col-3">
 					<div class="card-body d-flex justify-content-end">
                         <button type="button" class="btn btn-primary btn-lg" @click="submit_file">Publish</button>                            
+                    </div>
+                </div>
+            </div>
+            <div class="row" v-if="show_username_form">
+                <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#modal" />
+                <Modal title="Error" message="The chosen username is already taken" />
+				<div class="col-10">
+					<div class="card-body h-100 d-flex align-items-center">
+                        <input v-model="newUsername" class="form-control form-control-lg" id="formUsername" placeholder="Your new fantastic username! 😜" />
+					</div>
+				</div>
+
+				<div class="col-2">
+					<div class="card-body d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-lg" @click="updateUsername">Set</button>                            
                     </div>
                 </div>
             </div>

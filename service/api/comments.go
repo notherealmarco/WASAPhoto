@@ -89,14 +89,14 @@ func (rt *_router) PostComment(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// check if the comment is valid (should not contain newlines and at be between 5 and 255 characters)
-	stat, err := regexp.Match(`^[*]{5, 255}$`, []byte(request_body.Comment))
+	stat, err := regexp.Match(`^(.*)*`, []byte(request_body.Comment))
 
 	if err != nil {
 		helpers.SendInternalError(err, "Error matching regex", w, rt.baseLogger)
 		return
 	}
 
-	if !stat {
+	if !stat || len(request_body.Comment) < 5 || len(request_body.Comment) > 255 {
 		helpers.SendBadRequest(w, "Invalid comment", rt.baseLogger)
 		return
 	}

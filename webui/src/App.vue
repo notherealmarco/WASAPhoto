@@ -1,13 +1,28 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import getCurrentSession from './services/authentication';
+import { updateToken } from './services/axios';
 </script>
+
 <script>
 export default {
 	data() {
 		return {
-			my_id: sessionStorage.getItem("token"),
+			currentSession: "",
 		}
 	},
+	created() {
+		if (!this.getCurrentSession()) {
+			this.$router.push({ path: "/login" });
+		} else {
+			updateToken()
+		}
+	},
+	computed: {
+    linkTo() {
+      return "/profile/" + this.getCurrentSession();
+    }
+  }
 }
 </script>
 
@@ -69,7 +84,7 @@ export default {
 					<RouterLink to="/search" class="col-4 text-center">
 						<i class="bi bi-search text-dark" style="font-size: 2em"></i>
 					</RouterLink>
-					<RouterLink :to="'/profile/' + my_id" class="col-4 text-center">
+					<RouterLink to="/profile/me" class="col-4 text-center">
 						<i class="bi bi-person text-dark" style="font-size: 2em"></i>
 					</RouterLink>
 			</nav>

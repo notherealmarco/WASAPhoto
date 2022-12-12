@@ -1,18 +1,53 @@
 <script>
+import getCurrentSession from '../services/authentication';
 
 export default {
-	props: ["user_id", "name", "date", "comments", "likes", "photo_id", "liked", "my_id"],
+	props: ["user_id", "name", "date", "comments", "likes", "photo_id", "liked"],
 	data: function() {
 		return {
 			imageSrc: "",
 			errorMsg: null,
 			post_liked: this.liked,
 			post_like_cnt: this.likes,
+			comments_data: [],
+			comments_start_idx: 0,
+			comments_shown: false,
+			commentMsg: "",
 		}
 	},
 	methods: {
+		postComment() {
+			this.$axios.post("/users/" + this.user_id + "/photos/" + this.photo_id + "/comments", {
+				"comment": this.commentMsg,
+				"user_id": getCurrentSession(),
+			}).then(response => {
+				this.commentMsg = "";
+
+				this.comments_data = [];
+				this.comments_start_idx = 0;
+				this.getComments();
+			}).catch(error => {
+				console.log(error);
+				this.errorMsg = error.toString();
+			});
+		},
+		getComments() {
+			this.$axios.get("/users/" + this.user_id + "/photos/" + this.photo_id +
+					"/comments?limit=2&start_index=" + this.comments_start_idx).then(response => {
+				
+				if (response.data.length == 0) this.data_ended = true;
+				else this.comments_start_idx += 2;
+
+				this.comments_data = this.comments_data.concat(response.data);
+				this.comments_shown = true;
+				//alert(this.comments[0]["comment"]);
+			}).catch(error => {
+				console.log(error);
+				this.errorMsg = error.toString();
+			});
+		},
 		like() {
-			this.$axios.put("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + this.my_id).then(response => {
+			this.$axios.put("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + getCurrentSession()).then(response => {
 				this.post_liked = true;
 				this.post_like_cnt++;
 			}).catch(error => {
@@ -21,7 +56,7 @@ export default {
 			});
 		},
 		unlike() {
-			this.$axios.delete("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + this.my_id).then(response => {
+			this.$axios.delete("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + getCurrentSession()).then(response => {
 				this.post_liked = false;
 				this.post_like_cnt--;
 			}).catch(error => {
@@ -60,12 +95,33 @@ export default {
 
 				<div class="col-2">
 					<div class="card-body d-flex justify-content-end" style="display: inline-flex"> <!-- not quite sure flex is the right property, but it works -->
-						<a><h5><i class="card-title bi bi-chat-right pe-1"></i></h5></a>
+						<a @click="getComments"><h5><i class="card-title bi bi-chat-right pe-1"></i></h5></a>
 						<h6 class="card-text d-flex align-items-end text-muted">{{ comments }}</h6>
 						<a v-if="!post_liked" @click="like"><h5><i class="card-title bi bi-suit-heart ps-2 pe-1 like-icon"></i></h5></a>
 						<a v-if="post_liked" @click="unlike"><h5><i class="card-title bi bi-heart-fill ps-2 pe-1 like-icon like-red"></i></h5></a>
 						<h6 class="card-text d-flex align-items-end text-muted">{{ post_like_cnt }}</h6>
 						<h5></h5>
+					</div>
+				</div>
+			</div>
+			<div v-if="comments_shown">
+				<div v-for="item of comments_data" class="row">
+					<div class="col-7 card-body border-top">
+						<b>{{ item.name }}:</b> {{ item.comment }}
+					</div>
+					<div class="col-5 card-body border-top text-end text-secondary">
+						{{ new Date(Date.parse(item.date)).toDateString() }}
+					</div>
+				</div>
+				<div v-if="!data_ended" class="col-12 card-body text-end pt-0 pb-1 px-0">
+					<a @click="getComments" class="text-primary">Mostra altro...</a>
+				</div>
+				<div class="row">
+					<div class="col-10 card-body border-top text-end">
+						<input v-model="commentMsg" type="text" class="form-control" placeholder="Commenta...">
+					</div>
+					<div class="col-1 card-body border-top text-end ps-0 d-flex">
+						<button style="width: 100%" type="button" class="btn btn-primary" @click="postComment">Go</button>
 					</div>
 				</div>
 			</div>

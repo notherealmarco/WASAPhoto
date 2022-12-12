@@ -1,4 +1,5 @@
 <script>
+import getCurrentSession from '../services/authentication';
 export default {
 	data: function() {
 		return {
@@ -8,7 +9,6 @@ export default {
 			data_ended: false,
 			start_idx: 0,
 			limit: 1,
-			my_id: sessionStorage.getItem("token"),
 		}
 	},
 	methods: {
@@ -76,8 +76,7 @@ export default {
 									:date="item.date"
 									:comments="item.comments"
 									:likes="item.likes"
-									:liked="item.liked"
-									:my_id="my_id" />
+									:liked="item.liked" />
 					</div>
 
 					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">

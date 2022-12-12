@@ -1,4 +1,5 @@
 <script>
+import getCurrentSession from '../services/authentication';
 export default {
 	data: function() {
 		return {
@@ -9,7 +10,6 @@ export default {
 			start_idx: 0,
 			limit: 1,
 			field_username: "",
-			my_id: sessionStorage.getItem("token"),
 		}
 	},
 	methods: {
@@ -80,8 +80,7 @@ export default {
 								:user_id="item.user_id"
 								:name="item.name"
 								:followed="item.followed"
-								:banned="item.banned"
-								:my_id="my_id" />
+								:banned="item.banned" />
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />

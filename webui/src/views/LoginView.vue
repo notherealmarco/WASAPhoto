@@ -8,6 +8,7 @@ export default {
             loading: false,
             some_data: null,
             field_username: "",
+            rememberLogin: false,
         };
     },
     methods: {
@@ -20,9 +21,16 @@ export default {
                 });
                 //this.$router.push({ name: "home" });
                 if (response.status == 201 || response.status == 200) {
-                    // Save the token in the session storage
-                    sessionStorage.setItem("token", response.data["user_id"]);
-
+                    // Save the token in the local storage if the user wants to be remembered
+                    if (this.rememberLogin) {
+                        localStorage.setItem("token", response.data["user_id"])
+                        sessionStorage.removeItem("token");
+                    } 
+                    // Else save the token in the session storage
+                    else {
+                        sessionStorage.setItem("token", response.data["user_id"]);
+                        localStorage.removeItem("token");
+                    }
                     // Update the header
                     this.$axiosUpdate();
 
@@ -75,8 +83,8 @@ export default {
 		
 			<!-- Password input -->
 			<div class="form-floating mb-4">
-				<input disabled type="password" id="formPassword" class="form-control" placeholder="gattina12"/>
-				<label class="form-label" for="formPassword">Password</label>
+				<input style="display: none" disabled type="password" id="formPassword" class="form-control" placeholder="gattina12"/>
+				<label style="display: none" class="form-label" for="formPassword">Password</label>
 			</div>
 		
 			<!-- 2 column grid layout for inline styling -->
@@ -84,7 +92,7 @@ export default {
 				<div class="col d-flex justify-content-center">
 					<!-- Checkbox -->
 					<div class="form-check">
-						<input class="form-check-input" type="checkbox" value="" id="form2Example31" checked />
+						<input v-model="rememberLogin" class="form-check-input" type="checkbox" value="" id="form2Example31" />
 						<label class="form-check-label" for="form2Example31">Remember me</label>
 					</div>
 				</div>

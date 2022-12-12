@@ -1,15 +1,15 @@
 <script>
+import getCurrentSession from "../services/authentication";
 export default {
 	data: function() {
 		return {
+			requestedProfile: this.$route.params.user_id,
 			errormsg: null,
 			loading: false,
 			stream_data: [],
 			data_ended: false,
 			start_idx: 0,
 			limit: 1,
-			my_id: sessionStorage.getItem("token"),
-
             user_data: [],
 		}
 	},
@@ -23,10 +23,9 @@ export default {
 			this.loadContent();
 		},
 
-
         async getMainData() {
             try {
-                let response = await this.$axios.get("/users/" + this.$route.params.user_id);
+                let response = await this.$axios.get("/users/" + this.requestedProfile);
                 this.user_data = response.data;
             } catch(e) {
                 this.errormsg = e.toString();
@@ -37,7 +36,7 @@ export default {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				let response = await this.$axios.get("/users/" + this.$route.params.user_id + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
+				let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
 				if (response.data.length == 0) this.data_ended = true;
 				else this.stream_data = this.stream_data.concat(response.data);
 				this.loading = false;
@@ -58,10 +57,18 @@ export default {
 			}
 		},
 	},
-	mounted() {
+	created() {
 		// this way we are sure that we fill the first page
 		// 450 is a bit more of the max height of a post
 		// todo: may not work in 4k screens :/
+
+		if (this.$route.params.user_id == "me") {
+			//this.$router.replace({ path: "/profile/" +  });
+			this.requestedProfile = getCurrentSession();
+		}else {
+			this.requestedProfile = this.$route.params.user_id;
+		}
+
         this.getMainData();
 		this.limit = Math.round(window.innerHeight / 450);
 		this.scroll();
@@ -79,11 +86,11 @@ export default {
 
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
-                    <UserCard :user_id = "$route.params.user_id"
+                    <UserCard :user_id = "requestedProfile"
                                 :name = "user_data['name']"
                                 :followed = "user_data['followed']"
                                 :banned = "user_data['banned']"
-                                :my_id = "my_id"
+                                :my_id = "getCurrentSession"
                                 :show_new_post = "true"
                                 @updateInfo = "getMainData"
                                 @updatePosts = "refresh" />
@@ -104,14 +111,13 @@ export default {
                     </div>
 
 					<div id="main-content" v-for="item of stream_data">
-						<PostCard :user_id = "$route.params.user_id"
+						<PostCard :user_id = "requestedProfile"
 									:photo_id = "item.photo_id"
 									:name = "user_data['name']"
 									:date = "item.date"
 									:comments = "item.comments"
 									:likes = "item.likes"
-									:liked = "item.liked"
-									:my_id = "my_id" />
+									:liked = "item.liked" />
 					</div>
 
 					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">

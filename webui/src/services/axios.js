@@ -1,4 +1,5 @@
 import axios from "axios";
+import getCurrentSession from "./authentication";
 
 const instance = axios.create({
 	baseURL: __API_URL__,
@@ -13,7 +14,7 @@ const instance = axios.create({
 //});
 
 const updateToken = () => {
-	instance.defaults.headers.common['Authorization'] = 'Bearer ' + sessionStorage.getItem('token');
+	instance.defaults.headers.common['Authorization'] = 'Bearer ' + getCurrentSession();
 }
 
 export {
