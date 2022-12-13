@@ -1,12 +1,9 @@
 <script>
-import getCurrentSession from '../services/authentication';
-
 export default {
 	props: ["user_id", "name", "date", "comments", "likes", "photo_id", "liked"],
 	data: function() {
 		return {
 			imageSrc: "",
-			errorMsg: null,
 			post_liked: this.liked,
 			post_like_cnt: this.likes,
 			comments_data: [],
@@ -19,17 +16,14 @@ export default {
 		postComment() {
 			this.$axios.post("/users/" + this.user_id + "/photos/" + this.photo_id + "/comments", {
 				"comment": this.commentMsg,
-				"user_id": getCurrentSession(),
+				"user_id": this.$currentSession(),
 			}).then(response => {
 				this.commentMsg = "";
 
 				this.comments_data = [];
 				this.comments_start_idx = 0;
 				this.getComments();
-			}).catch(error => {
-				console.log(error);
-				this.errorMsg = error.toString();
-			});
+			})
 		},
 		getComments() {
 			this.$axios.get("/users/" + this.user_id + "/photos/" + this.photo_id +
@@ -40,29 +34,19 @@ export default {
 
 				this.comments_data = this.comments_data.concat(response.data);
 				this.comments_shown = true;
-				//alert(this.comments[0]["comment"]);
-			}).catch(error => {
-				console.log(error);
-				this.errorMsg = error.toString();
-			});
+			})
 		},
 		like() {
-			this.$axios.put("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + getCurrentSession()).then(response => {
+			this.$axios.put("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + this.$currentSession()).then(response => {
 				this.post_liked = true;
 				this.post_like_cnt++;
-			}).catch(error => {
-				console.log(error);
-				this.errorMsg = error.toString();
-			});
+			})
 		},
 		unlike() {
-			this.$axios.delete("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + getCurrentSession()).then(response => {
+			this.$axios.delete("/users/" + this.user_id + "/photos/" + this.photo_id + "/likes/" + this.$currentSession()).then(response => {
 				this.post_liked = false;
 				this.post_like_cnt--;
-			}).catch(error => {
-				console.log(error);
-				this.errorMsg = error.toString();
-			});
+			})
 		},
 	},
 
@@ -81,7 +65,6 @@ export default {
 
 <template>
     <div class="card mb-5">
-		<!--<img v-auth-img="imageSrc" class="card-img-top" alt="Chicago Skyscrapers"/>-->
 		<div ref="imageContainer"></div>
 
 		<div class="container">
@@ -126,14 +109,7 @@ export default {
 				</div>
 			</div>
 		</div>
-
-		<!--<ul class="list-group list-group-light list-group-small">
-		<li class="list-group-item px-4">Cras justo odio</li>
-		<li class="list-group-item px-4">Dapibus ac facilisis in</li>
-		<li class="list-group-item px-4">Vestibulum at eros</li>
-		</ul>-->
 	</div>
-	<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 </template>
 
 <style>

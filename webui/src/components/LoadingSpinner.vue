@@ -14,5 +14,3 @@ export default {
 	</div>
 	<div v-if="!loading"><slot /></div>
 </template>
-
-<style></style>

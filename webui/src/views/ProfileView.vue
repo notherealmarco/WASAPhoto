@@ -1,5 +1,4 @@
 <script>
-import getCurrentSession from "../services/authentication";
 export default {
 	data: function() {
 		return {
@@ -16,6 +15,10 @@ export default {
 	methods: {
 		async refresh() {
             this.getMainData();
+
+			// this way we are sure that we fill the first page todo: check
+			// 450 is a bit more of the max height of a post
+			// todo: may not work in 4k screens :/
 			this.limit = Math.round(window.innerHeight / 450);
 			this.start_idx = 0;
 			this.data_ended = false;
@@ -41,9 +44,7 @@ export default {
 				else this.stream_data = this.stream_data.concat(response.data);
 				this.loading = false;
 			} catch (e) {
-				if (e.response.status == 401) { // todo: move from here
-					this.$router.push({ path: "/login" });
-				}
+				// todo: handle better
 				this.errormsg = e.toString();
 			}
 		},
@@ -58,21 +59,15 @@ export default {
 		},
 	},
 	created() {
-		// this way we are sure that we fill the first page
-		// 450 is a bit more of the max height of a post
-		// todo: may not work in 4k screens :/
-
 		if (this.$route.params.user_id == "me") {
-			//this.$router.replace({ path: "/profile/" +  });
-			this.requestedProfile = getCurrentSession();
-		}else {
+			//this.$router.replace({ path: "/profile/" +  }); (It's ok to not redirect, it's just a matter of taste)
+			this.requestedProfile = this.$currentSession();
+		} else {
 			this.requestedProfile = this.$route.params.user_id;
 		}
 
-        this.getMainData();
-		this.limit = Math.round(window.innerHeight / 450);
 		this.scroll();
-		this.loadContent();
+		this.refresh();
 	}
 }
 </script>
@@ -90,7 +85,7 @@ export default {
                                 :name = "user_data['name']"
                                 :followed = "user_data['followed']"
                                 :banned = "user_data['banned']"
-                                :my_id = "getCurrentSession"
+                                :my_id = "this.$currentSession"
                                 :show_new_post = "true"
                                 @updateInfo = "getMainData"
                                 @updatePosts = "refresh" />
@@ -128,9 +123,7 @@ export default {
 				</div>
 			</div>
 		</div>
-
 	</div>
 </template>
-
 <style>
 </style>

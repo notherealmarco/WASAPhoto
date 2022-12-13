@@ -1,5 +1,4 @@
 <script>
-import getCurrentSession from '../services/authentication';
 export default {
 	data: function() {
 		return {
@@ -13,6 +12,9 @@ export default {
 	},
 	methods: {
 		async refresh() {
+			// this way we are sure that we fill the first page
+			// 450 is a bit more of the max height of a post
+			// todo: may not work in 4k screens :/
 			this.limit = Math.round(window.innerHeight / 450);
 			this.start_idx = 0;
 			this.data_ended = false;
@@ -28,9 +30,7 @@ export default {
 				else this.stream_data = this.stream_data.concat(response.data);
 				this.loading = false;
 			} catch (e) {
-				if (e.response.status == 401) {
-					this.$router.push({ path: "/login" });
-				}
+				// todo: handle better
 				this.errormsg = e.toString();
 			}
 		},
@@ -45,12 +45,8 @@ export default {
 		},
 	},
 	mounted() {
-		// this way we are sure that we fill the first page
-		// 450 is a bit more of the max height of a post
-		// todo: may not work in 4k screens :/
-		this.limit = Math.round(window.innerHeight / 450);
 		this.scroll();
-		this.loadContent();
+		this.refresh();
 	}
 }
 </script>
@@ -87,9 +83,5 @@ export default {
 				</div>
 			</div>
 		</div>
-
 	</div>
 </template>
-
-<style>
-</style>

@@ -1,36 +1,27 @@
 <script>
-import getCurrentSession from '../services/authentication';
 export default {
-	props: ["user_id", "name", "followed", "banned", "show_new_post"],
-    watch: { 
-        banned: function(new_val, old_val) {
-          this.user_banned = new_val;
+    props: ["user_id", "name", "followed", "banned", "show_new_post"],
+    watch: {
+        banned: function (new_val, old_val) {
+            this.user_banned = new_val;
         },
-        followed: function(new_val, old_val) {
-          this.user_followed = new_val;
+        followed: function (new_val, old_val) {
+            this.user_followed = new_val;
         },
     },
-	data: function() {
-		return {
-			errorMsg: "aaa",
-			user_followed: this.followed,
-			user_banned: this.banned,
-            myself: getCurrentSession() == this.user_id,
+    data: function () {
+        return {
+            errorMsg: "aaa",
+            user_followed: this.followed,
+            user_banned: this.banned,
+            myself: this.$currentSession() == this.user_id,
             show_post_form: false,
             show_username_form: false,
             newUsername: "",
             upload_file: null,
-
-            modalTitle: "",
-            modalMsg: "",
-		}
-	},
-	methods: {
-        playModal(title, msg) {
-            this.modalTitle = title
-            this.modalMsg = msg
-            this.$refs.openModal.click()
-        },
+        }
+    },
+    methods: {
         logout() {
             localStorage.removeItem("token");
             sessionStorage.removeItem("token");
@@ -39,142 +30,134 @@ export default {
         visit() {
             this.$router.push({ path: "/profile/" + this.user_id });
         },
-		follow() {
-			this.$axios.put("/users/" + this.user_id + "/followers/" + getCurrentSession())
-            .then(response => {
-                this.user_followed = true
-                this.$emit('updateInfo')
-            })
-            .catch(error => this.playModal("Error", error.toString()));
-		},
-		unfollow() {
-			this.$axios.delete("/users/" + this.user_id + "/followers/" + getCurrentSession())
-            .then(response => {
-                this.user_followed = false
-                this.$emit('updateInfo')
-            })
-            .catch(error => this.playModal("Error", error.toString()));
-		},
-		ban() {
-			this.$axios.put("/users/" + getCurrentSession() + "/bans/" + this.user_id)
-            .then(response => {
-                this.user_banned = true
-                this.$emit('updateInfo')
-            })
-            .catch(error => this.playModal("Error", error.toString()));
-		},
-		unban() {
-			this.$axios.delete("/users/" + getCurrentSession() + "/bans/" + this.user_id)
-            .then(response => {
-                this.user_banned = false
-                this.$emit('updateInfo')
-            })
-            .catch(error => this.playModal("Error", error.toString()));
-		},
+        follow() {
+            this.$axios.put("/users/" + this.user_id + "/followers/" + this.$currentSession())
+                .then(response => {
+                    this.user_followed = true
+                    this.$emit('updateInfo')
+                })
+        },
+        unfollow() {
+            this.$axios.delete("/users/" + this.user_id + "/followers/" + this.$currentSession())
+                .then(response => {
+                    this.user_followed = false
+                    this.$emit('updateInfo')
+                })
+        },
+        ban() {
+            this.$axios.put("/users/" + this.$currentSession() + "/bans/" + this.user_id)
+                .then(response => {
+                    this.user_banned = true
+                    this.$emit('updateInfo')
+                })
+        },
+        unban() {
+            this.$axios.delete("/users/" + this.$currentSession() + "/bans/" + this.user_id)
+                .then(response => {
+                    this.user_banned = false
+                    this.$emit('updateInfo')
+                })
+        },
         load_file(e) {
             let files = e.target.files || e.dataTransfer.files;
             if (!files.length) return;
             this.upload_file = files[0];
         },
         submit_file() {
-            this.$axios.post("/users/" + getCurrentSession() + "/photos", this.upload_file)
-            .then(response => {
-                this.show_post_form = false
-                this.$emit('updatePosts')
-            })
-            .catch(error => {
-                if (error.response.status != null && error.response.data != null) {
-                    this.modalTitle = "Error"
-                    this.modalMsg = error.response.data
-                    this.$refs.openModal.click()
-                } else {
-                    this.playModal("Error", error.toString())
-                }
-                this.playModal("Error", error.toString())
-            });
+            this.$axios.post("/users/" + this.$currentSession() + "/photos", this.upload_file)
+                .then(response => {
+                    this.show_post_form = false
+                    this.$emit('updatePosts')
+                })
         },
         updateUsername() {
-            this.$axios.put("/users/" + getCurrentSession() + "/username", {name: this.newUsername})
-            .then(response => {
-                this.show_username_form = false
-                this.$emit('updateInfo')
-                this.name = this.newUsername
-            })
-            .catch(error => {
-                if (error.response.status == 409) {
-                    this.modalTitle = "Error"
-                    this.modalMsg = "The chosen username is already taken."
-                    this.$refs.openModal.click()
-                } else {
-                    this.playModal("Error", error.toString())
-                }
-            });
+            this.$axios.put("/users/" + this.$currentSession() + "/username", { name: this.newUsername })
+                .then(response => {
+                    this.show_username_form = false
+                    this.$emit('updateInfo')
+                    this.name = this.newUsername
+                })
         },
-	},
+    },
     created() {
     },
 }
 </script>
 <template>
 
-    <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#modal" />
-    <Modal :title="modalTitle" :message="modalMsg" />
-
     <div class="card mb-3">
-		<div class="container">
-			<div class="row">
-				<div class="col-10">
-					<div class="card-body h-100 d-flex align-items-center">
-						<a @click="visit"><h5 class="card-title mb-0">{{ name }}</h5></a>
-					</div>
-				</div>
+        <div class="container">
+            <div class="row">
+                <div class="col-5">
+                    <div class="card-body h-100 d-flex align-items-center">
+                        <a @click="visit">
+                            <h5 class="card-title mb-0">{{ name }}</h5>
+                        </a>
+                    </div>
+                </div>
 
-				<div class="col-2">
-					<div class="card-body d-flex justify-content-end">
+                <div class="d-flex flex-column" v-bind:class="{
+                                                'col-12': (myself && show_new_post),
+                                                'col-sm-7': (myself && show_new_post),
+                                                'col-7': !(myself && show_new_post),
+                                                'align-items-end': !(myself && show_new_post),
+                                                'align-items-sm-end': (myself && show_new_post),
+                                            }">
+
+                    <div class="card-body d-flex">
                         <div v-if="!myself" class="d-flex">
-                            <button v-if="!user_banned" @click="ban" type="button" class="btn btn-outline-danger me-2">Ban</button>
-                            <button v-if="user_banned" @click="unban" type="button" class="btn btn-danger me-2">Banned</button>
-                            <button v-if="!user_followed" @click="follow" type="button" class="btn btn-primary">Follow</button>
-                            <button v-if="user_followed" @click="unfollow" type="button" class="btn btn-outline-primary">Following</button>
+                            <button v-if="!user_banned" @click="ban" type="button"
+                                class="btn btn-outline-danger me-2">Ban</button>
+                            <button v-if="user_banned" @click="unban" type="button"
+                                class="btn btn-danger me-2">Banned</button>
+                            <button v-if="!user_followed" @click="follow" type="button"
+                                class="btn btn-primary">Follow</button>
+                            <button v-if="user_followed" @click="unfollow" type="button"
+                                class="btn btn-outline-primary">Following</button>
                         </div>
                         <div v-if="(myself && !show_new_post)">
                             <button disabled type="button" class="btn btn-secondary">Yourself</button>
                         </div>
-                        <div v-if="(myself && show_new_post)" class="d-flex">
-                            <button type="button" class="btn btn-outline-danger me-2" @click="logout">Logout</button>                           
+                        <div v-if="(myself && show_new_post)" class="col">
+                            <button type="button" class="btn btn-outline-danger me-2" @click="logout">Logout</button>
                         </div>
-                        <div v-if="(myself && show_new_post)" class="d-flex">
-                            <button v-if="!show_username_form" type="button" class="btn btn-outline-secondary me-2" @click="show_username_form = true">Username</button>                           
-                        </div>
-                        <div v-if="(myself && show_new_post)" class="d-flex">
-                            <button v-if="!show_post_form" type="button" class="btn btn-primary" @click="show_post_form = true">Post</button>                            
+                        <div class="d-flex col justify-content-end flex-row">
+                            <div v-if="(myself && show_new_post)" class="">
+                                <button v-if="!show_username_form" type="button" class="btn btn-outline-secondary me-2"
+                                    @click="show_username_form = true">Username</button>
+                            </div>
+                            <div v-if="(myself && show_new_post)" class="">
+                                <button v-if="!show_post_form" type="button" class="btn btn-primary"
+                                    @click="show_post_form = true">Post</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row" v-if="show_post_form">
-				<div class="col-9">
-					<div class="card-body h-100 d-flex align-items-center">
+                <div class="col-9">
+                    <div class="card-body h-100 d-flex align-items-center">
                         <input @change="load_file" class="form-control form-control-lg" id="formFileLg" type="file" />
-					</div>
-				</div>
+                    </div>
+                </div>
 
-				<div class="col-3">
-					<div class="card-body d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary btn-lg" @click="submit_file">Publish</button>                            
+                <div class="col-3">
+                    <div class="card-body d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-lg" @click="submit_file">Publish</button>
                     </div>
                 </div>
             </div>
             <div class="row" v-if="show_username_form">
-				<div class="col-10">
-					<div class="card-body h-100 d-flex align-items-center">
-                        <input v-model="newUsername" class="form-control form-control-lg" id="formUsername" placeholder="Your new fantastic username! 😜" />
-					</div>
-				</div>
+                <div class="col-10">
+                    <div class="card-body h-100 d-flex align-items-center">
+                        <input v-model="newUsername" class="form-control form-control-lg" id="formUsername"
+                            placeholder="Your new fantastic username! 😜" />
+                    </div>
+                </div>
 
-				<div class="col-2">
-					<div class="card-body d-flex justify-content-end">
-                        <button type="button" class="btn btn-primary btn-lg" @click="updateUsername">Set</button>                            
+                <div class="col-2">
+                    <div class="card-body d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-lg" @click="updateUsername">Set</button>
                     </div>
                 </div>
             </div>

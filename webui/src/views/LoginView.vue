@@ -1,6 +1,4 @@
 <script>
-import LoadingSpinner from '../components/LoadingSpinner.vue';
-
 export default {
     data: function () {
         return {
@@ -34,7 +32,8 @@ export default {
                     // Update the header
                     this.$axiosUpdate();
 
-                    this.$router.push({ path: "/" });
+                    // Go back to the previous page
+                    this.$router.go(-1);
                 }
                 else {
                     this.errormsg = response.data["error"];
@@ -45,22 +44,7 @@ export default {
             }
             this.loading = false;
         },
-        async refresh() {
-            //this.loading = true;
-            //this.errormsg = null;
-            //try {
-            //	let response = await this.$axios.get("/");	
-            //	this.some_data = response.data;
-            //} catch (e) {
-            //	this.errormsg = e.toString();
-            //}
-            this.loading = false;
-        },
     },
-    mounted() {
-        this.refresh();
-    },
-    components: { LoadingSpinner }
 }
 </script>
 

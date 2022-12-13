@@ -1,50 +1,47 @@
 <script>
-import getCurrentSession from '../services/authentication';
+// import getCurrentSession from '../services/authentication'; todo: can be removed
 export default {
 	data: function() {
 		return {
 			errormsg: null,
 			loading: false,
-			stream_data: [],
-			data_ended: false,
-			start_idx: 0,
+			streamData: [],
+			dataEnded: false,
+			startIdx: 0,
 			limit: 1,
-			field_username: "",
+			fieldUsername: "",
 		}
 	},
 	methods: {
 		async refresh() {
 			this.limit = Math.round(window.innerHeight / 72);
-			this.start_idx = 0;
-			this.data_ended = false;
-			this.stream_data = [];
+			this.startIdx = 0;
+			this.dataEnded = false;
+			this.streamData = [];
 			this.loadContent();
 		},
 		async loadContent() {
 			this.loading = true;
 			this.errormsg = null;
-			if (this.field_username == "") {
+			if (this.fieldUsername == "") {
 				this.errormsg = "Please enter a username";
 				this.loading = false;
 				return;
 			}
 			try {
-				let response = await this.$axios.get("/users?query=" + this.field_username + "&start_index=" + this.start_idx + "&limit=" + this.limit);
-				if (response.data.length == 0) this.data_ended = true;
-				else this.stream_data = this.stream_data.concat(response.data);
+				let response = await this.$axios.get("/users?query=" + this.fieldUsername + "&start_index=" + this.startIdx + "&limit=" + this.limit);
+				if (response.data.length == 0) this.dataEnded = true;
+				else this.streamData = this.streamData.concat(response.data);
 				this.loading = false;
 			} catch (e) {
-				this.errormsg = e.toString();
-				if (e.response.status == 401) {
-					this.$router.push({ path: "/login" });
-				}
+				this.errormsg = e.toString(); // todo: handle better
 			}
 		},
 		scroll () {
 			window.onscroll = () => {
 				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
-				if (bottomOfWindow && !this.data_ended) {
-					this.start_idx += this.limit;
+				if (bottomOfWindow && !this.dataEnded) {
+					this.startIdx += this.limit;
 					this.loadContent();
 				}
 			}
@@ -71,11 +68,11 @@ export default {
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
                     <div class="form-floating mb-4">
-                        <input v-model="field_username" @input="refresh" id="formUsername" class="form-control" placeholder="name@example.com"/>
+                        <input v-model="fieldUsername" @input="refresh" id="formUsername" class="form-control" placeholder="name@example.com"/>
                         <label class="form-label" for="formUsername">Search by username</label>
                     </div>
 
-					<div id="main-content" v-for="item of stream_data">
+					<div id="main-content" v-for="item of streamData">
 						<UserCard
 								:user_id="item.user_id"
 								:name="item.name"
