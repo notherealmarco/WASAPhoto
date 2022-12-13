@@ -30,7 +30,7 @@ func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	if !stat { //todo: sta regex non me piace
+	if !stat { // todo: sta regex non me piace
 		helpers.SendBadRequest(w, "Username must be between 3 and 16 characters long and can only contain letters, numbers and underscores", rt.baseLogger)
 		return
 	}
