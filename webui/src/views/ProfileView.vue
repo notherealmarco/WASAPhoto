@@ -1,6 +1,6 @@
 <script>
 export default {
-	data: function() {
+	data: function () {
 		return {
 			requestedProfile: this.$route.params.user_id,
 			errormsg: null,
@@ -9,12 +9,12 @@ export default {
 			data_ended: false,
 			start_idx: 0,
 			limit: 1,
-            user_data: [],
+			user_data: [],
 		}
 	},
 	methods: {
 		async refresh() {
-            this.getMainData();
+			this.getMainData();
 
 			// this way we are sure that we fill the first page todo: check
 			// 450 is a bit more of the max height of a post
@@ -26,14 +26,14 @@ export default {
 			this.loadContent();
 		},
 
-        async getMainData() {
-            try {
-                let response = await this.$axios.get("/users/" + this.requestedProfile);
-                this.user_data = response.data;
-            } catch(e) {
-                this.errormsg = e.toString();
-            }
-        },
+		async getMainData() {
+			try {
+				let response = await this.$axios.get("/users/" + this.requestedProfile);
+				this.user_data = response.data;
+			} catch (e) {
+				this.errormsg = e.toString();
+			}
+		},
 
 		async loadContent() {
 			this.loading = true;
@@ -48,7 +48,7 @@ export default {
 				this.errormsg = e.toString();
 			}
 		},
-		scroll () {
+		scroll() {
 			window.onscroll = () => {
 				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
 				if (bottomOfWindow && !this.data_ended) {
@@ -81,42 +81,32 @@ export default {
 
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
-                    <UserCard :user_id = "requestedProfile"
-                                :name = "user_data['name']"
-                                :followed = "user_data['followed']"
-                                :banned = "user_data['banned']"
-                                :my_id = "this.$currentSession"
-                                :show_new_post = "true"
-                                @updateInfo = "getMainData"
-                                @updatePosts = "refresh" />
-                    
-                    <div class="row text-center mt-2 mb-3">
-                        <div class="col-4" style="border-right: 1px">
-                            <h3>{{ user_data["photos"] }}</h3>
-                            <h6>Photos</h6>
-                        </div>
-                        <div class="col-4">
-                            <h3>{{ user_data["followers"] }}</h3>
-                            <h6>Followers</h6>
-                        </div>
-                        <div class="col-4">
-                            <h3>{{ user_data["following"] }}</h3>
-                            <h6>Following</h6>
-                        </div>
-                    </div>
+					<UserCard :user_id="requestedProfile" :name="user_data['name']" :followed="user_data['followed']"
+						:banned="user_data['banned']" :my_id="this.$currentSession" :show_new_post="true"
+						@updateInfo="getMainData" @updatePosts="refresh" />
+
+					<div class="row text-center mt-2 mb-3">
+						<div class="col-4" style="border-right: 1px">
+							<h3>{{ user_data["photos"] }}</h3>
+							<h6>Photos</h6>
+						</div>
+						<div class="col-4">
+							<h3>{{ user_data["followers"] }}</h3>
+							<h6>Followers</h6>
+						</div>
+						<div class="col-4">
+							<h3>{{ user_data["following"] }}</h3>
+							<h6>Following</h6>
+						</div>
+					</div>
 
 					<div id="main-content" v-for="item of stream_data">
-						<PostCard :user_id = "requestedProfile"
-									:photo_id = "item.photo_id"
-									:name = "user_data['name']"
-									:date = "item.date"
-									:comments = "item.comments"
-									:likes = "item.likes"
-									:liked = "item.liked" />
+						<PostCard :user_id="requestedProfile" :photo_id="item.photo_id" :name="user_data['name']"
+							:date="item.date" :comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>
 
 					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">
-						Hai visualizzato tutti i post. Hooray! 👻
+						You reached the end. Hooray! 👻
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
@@ -126,4 +116,5 @@ export default {
 	</div>
 </template>
 <style>
+
 </style>
