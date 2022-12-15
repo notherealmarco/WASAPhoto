@@ -33,7 +33,7 @@ export default {
 			}
 
 			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
-			else this.stream_data = this.stream_data.concat(response.data);
+			this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
 		},
 		loadMore() {

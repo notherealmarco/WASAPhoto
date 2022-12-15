@@ -21,7 +21,8 @@ export default {
 			// this way we are sure that we fill the first page todo: check
 			// 450 is a bit more of the max height of a post
 			// todo: may not work in 4k screens :/
-			this.limit = Math.round(window.innerHeight / 450);
+			this.limit = Math.max(Math.round(window.innerHeight / 450), 1)
+			
 			this.start_idx = 0;
 			this.data_ended = false;
 			this.stream_data = [];
@@ -50,8 +51,10 @@ export default {
 			}
 
 			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
-			else this.stream_data = this.stream_data.concat(response.data);
+			this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
+
+			console.log(this.stream_data);
 
 		},
 		loadMore() {
