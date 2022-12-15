@@ -18,6 +18,8 @@ export default {
 	},
 
 	mounted() {
+		// Check if the user is already logged in
+		this.$axiosUpdate()
 
 		// Configure axios interceptors
 		this.$axios.interceptors.response.use(response => {
