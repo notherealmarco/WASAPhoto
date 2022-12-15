@@ -1,6 +1,6 @@
 <script>
 export default {
-	data: function() {
+	data: function () {
 		return {
 			loading: false,
 			stream_data: [],
@@ -25,7 +25,7 @@ export default {
 			this.loading = true;
 
 			let response = await this.$axios.get("/stream?start_index=" + this.start_idx + "&limit=" + this.limit);
-			
+
 			if (response == null) {
 				this.loading = false
 				this.loadingError = true
@@ -36,12 +36,16 @@ export default {
 			else this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
 		},
-		scroll () {
+		loadMore() {
+			this.start_idx += this.limit
+			this.loadContent()
+		},
+		scroll() {
 			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
+				
 				if (bottomOfWindow && !this.data_ended) {
-					this.start_idx += this.limit;
-					this.loadContent();
+					this.loadMore()
 				}
 			}
 		},
@@ -66,13 +70,8 @@ export default {
 					</div>
 
 					<div id="main-content" v-for="item of stream_data">
-						<PostCard :user_id="item.user_id"
-									:photo_id="item.photo_id"
-									:name="item.name"
-									:date="item.date"
-									:comments="item.comments"
-									:likes="item.likes"
-									:liked="item.liked" />
+						<PostCard :user_id="item.user_id" :photo_id="item.photo_id" :name="item.name" :date="item.date"
+							:comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>
 
 					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">
@@ -80,7 +79,13 @@ export default {
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
-					<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
+
+					<div class="d-flex align-items-center flex-column">
+						<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
+
+						<button v-if="(!data_ended && !loading)" @click="loadMore" class="btn btn-secondary py-1 mb-5"
+							style="border-radius: 15px">Load more</button>
+					</div>
 				</div>
 			</div>
 		</div>

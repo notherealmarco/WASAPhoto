@@ -54,12 +54,17 @@ export default {
 			this.loading = false;
 
 		},
+		loadMore() {
+			this.start_idx += this.limit
+			this.loadContent()
+		},
 		scroll() {
 			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
+				
 				if (bottomOfWindow && !this.data_ended) {
-					this.start_idx += this.limit;
-					this.loadContent();
+					this.start_idx += this.limit
+					this.loadMore()
 				}
 			}
 		},
@@ -113,8 +118,14 @@ export default {
 						You reached the end. Hooray! 👻
 					</div>
 
-					<LoadingSpinner :loading="loading" /><br />
-					<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
+					<LoadingSpinner :loading="loading" />
+
+					<div class="d-flex align-items-center flex-column">
+						<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
+
+						<button v-if="(!data_ended && !loading)" @click="loadMore" class="btn btn-secondary py-1 mb-5"
+							style="border-radius: 15px">Load more</button>
+					</div>
 				</div>
 			</div>
 		</div>
