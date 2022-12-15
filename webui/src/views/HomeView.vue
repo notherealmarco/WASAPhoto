@@ -2,12 +2,12 @@
 export default {
 	data: function() {
 		return {
-			errormsg: null,
 			loading: false,
 			stream_data: [],
 			data_ended: false,
 			start_idx: 0,
 			limit: 1,
+			loadingError: false,
 		}
 	},
 	methods: {
@@ -23,16 +23,18 @@ export default {
 		},
 		async loadContent() {
 			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/stream?start_index=" + this.start_idx + "&limit=" + this.limit);
-				if (response.data.length == 0) this.data_ended = true;
-				else this.stream_data = this.stream_data.concat(response.data);
-				this.loading = false;
-			} catch (e) {
-				// todo: handle better
-				this.errormsg = e.toString();
+
+			let response = await this.$axios.get("/stream?start_index=" + this.start_idx + "&limit=" + this.limit);
+			
+			if (response == null) {
+				this.loading = false
+				this.loadingError = true
+				return
 			}
+
+			if (response.data.length == 0) this.data_ended = true;
+			else this.stream_data = this.stream_data.concat(response.data);
+			this.loading = false;
 		},
 		scroll () {
 			window.onscroll = () => {
@@ -58,8 +60,6 @@ export default {
 				<div class="col-xl-6 col-lg-9">
 					<h3 class="card-title border-bottom mb-4 pb-2 text-center">Your daily WASAStream!</h3>
 
-					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-
 					<div v-if="(stream_data.length == 0)" class="alert alert-secondary text-center" role="alert">
 						There's nothing here 😢
 						<br />Why don't you start following somebody? 👻
@@ -80,6 +80,7 @@ export default {
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
+					<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
 				</div>
 			</div>
 		</div>

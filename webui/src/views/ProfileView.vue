@@ -3,8 +3,10 @@ export default {
 	data: function () {
 		return {
 			requestedProfile: this.$route.params.user_id,
-			errormsg: null,
+
 			loading: false,
+			loadingError: false,
+
 			stream_data: [],
 			data_ended: false,
 			start_idx: 0,
@@ -27,26 +29,30 @@ export default {
 		},
 
 		async getMainData() {
-			try {
-				let response = await this.$axios.get("/users/" + this.requestedProfile);
-				this.user_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
+			let response = await this.$axios.get("/users/" + this.requestedProfile);
+
+			if (response == null) {
+				this.loading = false
+				this.loadingError = true
+				return
 			}
+			this.user_data = response.data;
 		},
 
 		async loadContent() {
 			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
-				if (response.data.length == 0) this.data_ended = true;
-				else this.stream_data = this.stream_data.concat(response.data);
-				this.loading = false;
-			} catch (e) {
-				// todo: handle better
-				this.errormsg = e.toString();
+
+			let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
+
+			if (response == null) {
+				// do something
+				return
 			}
+
+			if (response.data.length == 0) this.data_ended = true;
+			else this.stream_data = this.stream_data.concat(response.data);
+			this.loading = false;
+
 		},
 		scroll() {
 			window.onscroll = () => {
@@ -79,8 +85,6 @@ export default {
 			<div class="row justify-content-md-center">
 				<div class="col-xl-6 col-lg-9">
 
-					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-
 					<UserCard :user_id="requestedProfile" :name="user_data['name']" :followed="user_data['followed']"
 						:banned="user_data['banned']" :my_id="this.$currentSession" :show_new_post="true"
 						@updateInfo="getMainData" @updatePosts="refresh" />
@@ -110,6 +114,7 @@ export default {
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
+					<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
 				</div>
 			</div>
 		</div>

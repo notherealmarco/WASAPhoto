@@ -26,20 +26,20 @@ export default {
 			// Leave response as is
 			return response;
 		}, error => {
-			if (error.response != undefined) {
+			if (error.response.status != 0) {
 				// If the response is 401, redirect to /login
 				if (error.response.status === 401) {
 					this.$router.push({ path: '/login' })
-					return
+					return;
 				}
 				
 				// Show the error message from the server in a modal
 				this.showModal("Error " + error.response.status, error.response.data['status'])
-				return
+				return;
 			}
 			// Show the error message from axios in a modal
 			this.showModal("Error", error.toString());
-			return error;
+			return;
 		});
 	}
 }

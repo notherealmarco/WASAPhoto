@@ -3,7 +3,7 @@ import getCurrentSession from "./authentication";
 
 const instance = axios.create({
 	baseURL: __API_URL__,
-	timeout: 1000 * 20
+	timeout: 1000 * 60
 });
 
 //axios.interceptors.request.use(function (config) {
