@@ -49,7 +49,7 @@ export default {
 				return
 			}
 
-			if (response.data.length == 0) this.data_ended = true;
+			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
 			else this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
 
@@ -61,7 +61,7 @@ export default {
 		scroll() {
 			window.onscroll = () => {
 				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
-				
+
 				if (bottomOfWindow && !this.data_ended) {
 					this.start_idx += this.limit
 					this.loadMore()

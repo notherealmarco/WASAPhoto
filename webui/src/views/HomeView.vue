@@ -32,7 +32,7 @@ export default {
 				return
 			}
 
-			if (response.data.length == 0) this.data_ended = true;
+			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
 			else this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
 		},

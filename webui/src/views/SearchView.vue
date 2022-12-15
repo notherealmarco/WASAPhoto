@@ -39,10 +39,10 @@ export default {
 		},
 		scroll () {
 			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
 				if (bottomOfWindow && !this.dataEnded) {
-					this.startIdx += this.limit;
-					this.loadContent();
+					this.startIdx += this.limit
+					this.loadContent()
 				}
 			}
 		},
