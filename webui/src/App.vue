@@ -5,16 +5,26 @@ export default {
 		return {
 			modalTitle: "Modal Title",
 			modalMsg: "Modal Message",
+			logged_in: true,
 		}
 	},
 	methods: {
 		showModal(title, message) {
-			this.modalTitle = title;
-			this.modalMsg = message;
+			this.modalTitle = title
+			this.modalMsg = message
 
 			// Simulate a click on the hidden modal button to open it
-			this.$refs.openModal.click();
+			this.$refs.openModal.click()
 		},
+		setLoggedIn() {
+			this.logged_in = true
+		},
+		logout() {
+			localStorage.removeItem("token")
+            sessionStorage.removeItem("token")
+			this.logged_in = false
+            this.$router.push({ path: "/login" })
+		}
 	},
 
 	mounted() {
@@ -30,6 +40,7 @@ export default {
 				// If the response is 401, redirect to /login
 				if (error.response.status === 401) {
 					this.$router.push({ path: '/login' })
+					this.logged_in = false;
 					return;
 				}
 				
@@ -53,13 +64,14 @@ export default {
 
 	<div class="container-fluid">
 		<div class="row">
-			<main class="mb-5">
+			<main>
 				<!-- The view is rendered here -->
 				<RouterView />
+				<div v-if="logged_in" class="mb-5 pb-3"></div> <!-- Empty div to avoid hiding items under the navbar. todo: find a better way to do this -->
 			</main>
 
 			<!-- Bottom navigation buttons -->
-			<nav id="global-nav" class="navbar fixed-bottom navbar-light bg-light row">
+			<nav v-if="logged_in" id="global-nav" class="navbar fixed-bottom navbar-light bg-light">
 				<div class="collapse navbar-collapse" id="navbarNav"></div>
 				<RouterLink to="/" class="col-4 text-center">
 					<i class="bi bi-house text-dark" style="font-size: 2em"></i>
