@@ -1,7 +1,7 @@
 <script>
 // import getCurrentSession from '../services/authentication'; todo: can be removed
 export default {
-	data: function() {
+	data: function () {
 		return {
 			errormsg: null,
 			loading: false,
@@ -28,16 +28,21 @@ export default {
 				this.loading = false;
 				return;
 			}
-			try {
-				let response = await this.$axios.get("/users?query=" + this.fieldUsername + "&start_index=" + this.startIdx + "&limit=" + this.limit);
-				if (response.data.length == 0) this.dataEnded = true;
-				else this.streamData = this.streamData.concat(response.data);
-				this.loading = false;
-			} catch (e) {
-				this.errormsg = e.toString(); // todo: handle better
+
+			let response = await this.$axios.get("/users?query=" + this.fieldUsername + "&start_index=" + this.startIdx + "&limit=" + this.limit);
+			
+			// Errors are handled by the interceptor, which shows a modal dialog to the user and returns a null response.
+			if (response == null) {
+				this.loading = false
+				return
 			}
+			
+			if (response.data.length == 0) this.dataEnded = true;
+			else this.streamData = this.streamData.concat(response.data);
+			this.loading = false;
+
 		},
-		scroll () {
+		scroll() {
 			window.onscroll = () => {
 				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
 				if (bottomOfWindow && !this.dataEnded) {
@@ -67,17 +72,15 @@ export default {
 
 					<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
-                    <div class="form-floating mb-4">
-                        <input v-model="fieldUsername" @input="refresh" id="formUsername" class="form-control" placeholder="name@example.com"/>
-                        <label class="form-label" for="formUsername">Search by username</label>
-                    </div>
+					<div class="form-floating mb-4">
+						<input v-model="fieldUsername" @input="refresh" id="formUsername" class="form-control"
+							placeholder="name@example.com" />
+						<label class="form-label" for="formUsername">Search by username</label>
+					</div>
 
 					<div id="main-content" v-for="item of streamData">
-						<UserCard
-								:user_id="item.user_id"
-								:name="item.name"
-								:followed="item.followed"
-								:banned="item.banned" />
+						<UserCard :user_id="item.user_id" :name="item.name" :followed="item.followed"
+							:banned="item.banned" />
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
@@ -89,4 +92,5 @@ export default {
 </template>
 
 <style>
+
 </style>

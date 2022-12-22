@@ -26,6 +26,7 @@ export default {
 
 			let response = await this.$axios.get("/stream?start_index=" + this.start_idx + "&limit=" + this.limit);
 
+			// Errors are handled by the interceptor, which shows a modal dialog to the user and returns a null response.
 			if (response == null) {
 				this.loading = false
 				this.loadingError = true
