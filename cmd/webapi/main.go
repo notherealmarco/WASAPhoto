@@ -120,6 +120,14 @@ func run() error {
 		logger.WithError(err).Error("error creating the API server instance")
 		return fmt.Errorf("creating the API server instance: %w", err)
 	}
+
+	// Create the directories if they don't exist
+	if err := os.MkdirAll(cfg.Data.Path, 0755); err != nil {
+		logger.WithError(err).Error("error creating data directory")
+		return fmt.Errorf("creating data directory: %w", err)
+	}
+
+
 	router := apirouter.Handler()
 
 	router, err = registerWebUI(router)

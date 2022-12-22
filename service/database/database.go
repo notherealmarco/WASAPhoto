@@ -98,8 +98,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if tables exist. If not, the database is empty, and we need to create the structure
 	var tableName string
 	//todo: check for all the tables, not just users
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
+	err := db.QueryRow(`SELECT uid from users LIMIT 1;`).Scan(&tableName)
+	if err != nil {
+		//fmt.Println("database is empty, creating structure")
 		sqlStmt := `CREATE TABLE "users" (
 			"uid"	TEXT NOT NULL,
 			"name"	TEXT NOT NULL UNIQUE,
