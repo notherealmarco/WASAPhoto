@@ -26,7 +26,7 @@ func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps htt
 	stat, err := regexp.Match(`^[a-zA-Z0-9_]{3,16}$`, []byte(req.Name))
 
 	if err != nil {
-		helpers.SendInternalError(err, "Error while matching username", w, rt.baseLogger)
+		helpers.SendInternalError(err, "Error while matching username regex", w, rt.baseLogger)
 		return
 	}
 
