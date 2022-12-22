@@ -23,9 +23,7 @@ export default {
     },
     methods: {
         logout() {
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("token");
-            this.$router.push({ path: "/login" });
+            this.$root.logout()
         },
         visit() {
             this.$router.push({ path: "/profile/" + this.user_id });

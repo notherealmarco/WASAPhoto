@@ -29,6 +29,8 @@ export default {
                         sessionStorage.setItem("token", response.data["user_id"]);
                         localStorage.removeItem("token");
                     }
+                    // Tell the root view to enable the navbar
+                    this.$root.setLoggedIn();
                     // Update the header
                     this.$axiosUpdate();
 
@@ -86,6 +88,7 @@ export default {
 			<button style="width: 100%" type="button" class="btn btn-primary btn-block mb-4" @click="login">Sign in</button>
             <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
             <LoadingSpinner :loading="loading" />
+            <i class="text-center text-secondary d-flex flex-column">repeat after me: "best password is no password"</i>
 		</form>
     </div>
         </div>
