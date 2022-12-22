@@ -12,6 +12,7 @@ export default {
 			comments_start_idx: 0,
 			comments_shown: false,
 			commentMsg: "",
+			data_ended: false,
 		}
 	},
 	methods: {
@@ -42,12 +43,14 @@ export default {
 			this.getComments();
 		},
 		getComments() {
+			this.data_ended = false
+
 			// Get comments from the server
 			this.$axios.get("/users/" + this.user_id + "/photos/" + this.photo_id +
-				"/comments?limit=2&start_index=" + this.comments_start_idx).then(response => {
+				"/comments?limit=5&start_index=" + this.comments_start_idx).then(response => {
 
 					if (response.data.length == 0) this.data_ended = true;
-					else this.comments_start_idx += 2;
+					else this.comments_start_idx += 5;
 
 					this.comments_data = this.comments_data.concat(response.data);
 					this.comments_shown = true;
