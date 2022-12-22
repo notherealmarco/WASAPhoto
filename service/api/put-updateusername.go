@@ -33,11 +33,13 @@ func (rt *_router) UpdateUsername(w http.ResponseWriter, r *http.Request, ps htt
 
 	status, err := rt.db.UpdateUsername(uid, req.Name)
 
+	// check if the username already exists
 	if status == database.ERR_EXISTS {
 		helpers.SendStatus(http.StatusConflict, w, "Username already exists", rt.baseLogger)
 		return
 	}
 
+	// handle any other database error
 	if err != nil {
 		helpers.SendInternalError(err, "Database error: UpdateUsername", w, rt.baseLogger)
 		return
