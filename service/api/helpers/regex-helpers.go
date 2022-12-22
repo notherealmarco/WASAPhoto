@@ -31,3 +31,10 @@ func MatchUsernameOrBadRequest(username string, w http.ResponseWriter, l logrus.
 		w,
 		l)
 }
+
+func MatchCommentOrBadRequest(comment string, w http.ResponseWriter, l logrus.FieldLogger) bool {
+	return MatchRegexOrBadRequest(comment,
+		`^(.){1,255}$`, "Comment must be between 1 and 255 characters long",
+		w,
+		l)
+}
