@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"regexp"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/notherealmarco/WASAPhoto/service/api/helpers"
@@ -26,33 +25,36 @@ func (rt *_router) PostSession(w http.ResponseWriter, r *http.Request, ps httpro
 	var request _reqbody
 	err := json.NewDecoder(r.Body).Decode(&request)
 
-	var uid string
-	if err == nil { // test if user exists
-		uid, err = rt.db.GetUserID(request.Name)
+	if err != nil {
+		helpers.SendBadRequestError(err, "Bad request body", w, rt.baseLogger)
+		return
 	}
 
-	if db_errors.EmptySet(err) { // user does not exist
+	// test if user exists
+	var uid string
+	uid, err = rt.db.GetUserID(request.Name)
 
-		// before creating the user, check if the name is valid
-		stat, regex_err := regexp.Match(`^[a-zA-Z0-9_]{3,16}$`, []byte(request.Name))
-		if regex_err != nil {
-			helpers.SendInternalError(err, "Error while matching username regex", w, rt.baseLogger)
-			return
-		}
-		if !stat {
-			// username didn't match the regex, so it's invalid, let's send a bad request error
-			helpers.SendBadRequest(w, "Username must be between 3 and 16 characters long and can only contain letters, numbers and underscores", rt.baseLogger)
+	// check if the database returned an empty set error, if so, create the new user
+	if db_errors.EmptySet(err) {
+
+		// before creating the user, check if the name is valid, otherwise send a bad request error
+		if !helpers.MatchUsernameOrBadRequest(request.Name, w, rt.baseLogger) {
 			return
 		}
 
 		uid, err = rt.db.CreateUser(request.Name)
 	}
-	if err != nil { // handle any other error
-		helpers.SendBadRequestError(err, "Bad request body", w, rt.baseLogger)
+
+	// handle database errors
+	if err != nil {
+		helpers.SendInternalError(err, "Database error", w, rt.baseLogger)
 		return
 	}
 
+	// set the response header
 	w.Header().Set("content-type", "application/json")
+
+	// encode the response body
 	err = json.NewEncoder(w).Encode(_respbody{UID: uid})
 
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DEFAULT_LIMIT  = 15 // don't know if should be moved to config
+	DEFAULT_LIMIT  = 15
 	DEFAULT_OFFSET = 0
 )
 
