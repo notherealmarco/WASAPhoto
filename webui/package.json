@@ -5,7 +5,8 @@
 		"dev": "vite",
 		"build-dev": "vite build --mode development",
 		"build-prod": "vite build --mode production",
-		"build-embed": "vite build --mode embedded --base=/dashboard/",
+		"build-embed": "vite build --mode production --base=/dashboard/",
+		"build-embed-host": "vite build --mode embedded --base=/dashboard/",
 		"preview": "vite preview --port 4173"
 	},
 	"dependencies": {
