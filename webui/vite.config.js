@@ -17,6 +17,10 @@ export default defineConfig(({command, mode, ssrBuild}) => {
 		ret.define = {
 			"__API_URL__": JSON.stringify("http://localhost:3000"),
 		};
+	} else if (mode === 'embedded') {
+		ret.define = {
+			"__API_URL__": JSON.stringify("/"),
+		};
 	} else {
 		ret.define = {
 			"__API_URL__": JSON.stringify("http://localhost:3000"),
