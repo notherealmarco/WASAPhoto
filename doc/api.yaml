@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: WASAPhoto API
   description: |-
@@ -920,6 +920,7 @@ components:
       maxLength: 36
       description: The user ID.
       format: uuid
+      pattern: '^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$' # RFC 4122
       example: "1b4e28ba-2fa1-11d2-883f-0016d3cca427"
     name_object:
       type: object
