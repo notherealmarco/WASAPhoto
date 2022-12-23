@@ -30,34 +30,29 @@ export default {
 			}
 
 			let response = await this.$axios.get("/users?query=" + this.fieldUsername + "&start_index=" + this.startIdx + "&limit=" + this.limit);
-			
+
 			// Errors are handled by the interceptor, which shows a modal dialog to the user and returns a null response.
 			if (response == null) {
 				this.loading = false
 				return
 			}
-			
+
 			if (response.data.length == 0) this.dataEnded = true;
 			else this.streamData = this.streamData.concat(response.data);
 			this.loading = false;
 
 		},
-		scroll() {
-			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
-				if (bottomOfWindow && !this.dataEnded) {
-					this.startIdx += this.limit
-					this.loadContent()
-				}
-			}
+		loadMore() {
+			if (this.loading || this.dataEnded) return
+			this.startIdx += this.limit
+			this.loadContent()
 		},
 	},
 	mounted() {
 		// this way we are sure that we fill the first page
 		// 72 is a bit more of the max height of a card
 		// todo: may not work in 4k screens :/
-		this.limit = Math.round(window.innerHeight / 72);
-		this.scroll();
+		this.limit = Math.round(window.innerHeight / 72)
 	}
 }
 </script>
@@ -84,6 +79,7 @@ export default {
 					</div>
 
 					<LoadingSpinner :loading="loading" /><br />
+					<IntersectionObserver sentinal-name="load-more-search" @on-intersection-element="loadMore" />
 				</div>
 			</div>
 		</div>

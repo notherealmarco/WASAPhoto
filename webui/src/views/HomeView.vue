@@ -38,21 +38,12 @@ export default {
 			this.loading = false;
 		},
 		loadMore() {
+			if (this.loading || this.data_ended) return
 			this.start_idx += this.limit
 			this.loadContent()
 		},
-		scroll() {
-			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
-				
-				if (bottomOfWindow && !this.data_ended) {
-					this.loadMore()
-				}
-			}
-		},
 	},
 	mounted() {
-		this.scroll();
 		this.refresh();
 	}
 }
@@ -86,6 +77,7 @@ export default {
 
 						<button v-if="(!data_ended && !loading)" @click="loadMore" class="btn btn-secondary py-1 mb-5"
 							style="border-radius: 15px">Load more</button>
+						<IntersectionObserver sentinal-name="load-more-home" @on-intersection-element="loadMore" />
 					</div>
 				</div>
 			</div>

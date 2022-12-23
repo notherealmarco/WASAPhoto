@@ -1,88 +1,70 @@
 <script>
+import IntersectionObserver from '../components/IntersectionObserver.vue';
+
 export default {
 	data: function () {
 		return {
 			requestedProfile: this.$route.params.user_id,
-
-			loading: false,
+			loading: true,
 			loadingError: false,
-
 			stream_data: [],
 			data_ended: false,
 			start_idx: 0,
 			limit: 1,
 			user_data: [],
-		}
+		};
 	},
 	methods: {
 		async refresh() {
 			this.getMainData();
-
 			// this way we are sure that we fill the first page todo: check
 			// 450 is a bit more of the max height of a post
 			// todo: may not work in 4k screens :/
-			this.limit = Math.max(Math.round(window.innerHeight / 450), 1)
-			
+			this.limit = Math.max(Math.round(window.innerHeight / 450), 1);
 			this.start_idx = 0;
 			this.data_ended = false;
 			this.stream_data = [];
 			this.loadContent();
 		},
-
 		async getMainData() {
 			let response = await this.$axios.get("/users/" + this.requestedProfile);
-
 			if (response == null) {
-				this.loading = false
-				this.loadingError = true
-				return
+				this.loading = false;
+				this.loadingError = true;
+				return;
 			}
 			this.user_data = response.data;
 		},
-
 		async loadContent() {
 			this.loading = true;
-
 			let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
-
 			if (response == null) {
 				// do something
-				return
+				return;
 			}
-
-			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
+			if (response.data.length == 0 || response.data.length < this.limit)
+				this.data_ended = true;
 			this.stream_data = this.stream_data.concat(response.data);
 			this.loading = false;
-
-			console.log(this.stream_data);
-
 		},
 		loadMore() {
+			if (this.loading || this.data_ended) return
 			this.start_idx += this.limit
 			this.loadContent()
-		},
-		scroll() {
-			window.onscroll = () => {
-				let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight >= document.documentElement.offsetHeight - 5
-
-				if (bottomOfWindow && !this.data_ended) {
-					this.start_idx += this.limit
-					this.loadMore()
-				}
-			}
 		},
 	},
 	created() {
 		if (this.$route.params.user_id == "me") {
 			//this.$router.replace({ path: "/profile/" +  }); (It's ok to not redirect, it's just a matter of taste)
 			this.requestedProfile = this.$currentSession();
-		} else {
+		}
+		else {
 			this.requestedProfile = this.$route.params.user_id;
 		}
-
-		this.scroll();
+		//this.scroll();
 		this.refresh();
-	}
+	},
+	components: { IntersectionObserver }
 }
 </script>
 
@@ -128,6 +110,7 @@ export default {
 
 						<button v-if="(!data_ended && !loading)" @click="loadMore" class="btn btn-secondary py-1 mb-5"
 							style="border-radius: 15px">Load more</button>
+						<IntersectionObserver sentinal-name="load-more-profile" @on-intersection-element="loadMore" />
 					</div>
 				</div>
 			</div>
