@@ -2,6 +2,9 @@
 export default {
     props: ["user_id", "name", "followed", "banned", "show_new_post"],
     watch: {
+        name: function (new_val, old_val) {
+            this.username = new_val;
+        },
         banned: function (new_val, old_val) {
             this.user_banned = new_val;
         },
@@ -78,7 +81,7 @@ export default {
                 })
         },
     },
-    created() {
+    mounted() {
     },
 }
 </script>
