@@ -11,6 +11,7 @@ export default {
     },
     data: function () {
         return {
+            username: this.name,
             errorMsg: "aaa",
             user_followed: this.followed,
             user_banned: this.banned,
@@ -73,7 +74,7 @@ export default {
                 .then(response => {
                     this.show_username_form = false
                     this.$emit('updateInfo')
-                    this.name = this.newUsername
+                    this.username = this.newUsername
                 })
         },
     },
@@ -89,7 +90,7 @@ export default {
                 <div class="col-5">
                     <div class="card-body h-100 d-flex align-items-center">
                         <a @click="visit">
-                            <h5 class="card-title mb-0">{{ name }}</h5>
+                            <h5 class="card-title mb-0">{{ username }}</h5>
                         </a>
                     </div>
                 </div>
