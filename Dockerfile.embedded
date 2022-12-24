@@ -8,7 +8,7 @@ ARG DOCKER_PREFIX
 FROM ${DOCKER_PREFIX}node:lts AS uibuilder
 COPY webui webui
 WORKDIR webui
-RUN npm config set update-notifier false && npm install && npm run build-embed
+RUN npm config set update-notifier false && npm install && npm run build-embed-host
 
 ARG DOCKER_PREFIX
 FROM ${DOCKER_PREFIX}enrico204/golang:1.19.4-6 AS builder
