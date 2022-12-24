@@ -61,7 +61,7 @@ export default {
 						<br />Why don't you start following somebody? 👻
 					</div>
 
-					<div id="main-content" v-for="item of stream_data">
+					<div id="main-content" v-for="item of stream_data" v-bind:key="item.photo_id">
 						<PostCard :user_id="item.user_id" :photo_id="item.photo_id" :name="item.name" :date="item.date"
 							:comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>

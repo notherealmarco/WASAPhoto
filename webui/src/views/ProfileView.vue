@@ -94,7 +94,7 @@ export default {
 						</div>
 					</div>
 
-					<div id="main-content" v-for="item of stream_data">
+					<div id="main-content" v-for="item of stream_data" v-bind:key="item.photo_id">
 						<PostCard :user_id="requestedProfile" :photo_id="item.photo_id" :name="user_data['name']"
 							:date="item.date" :comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>

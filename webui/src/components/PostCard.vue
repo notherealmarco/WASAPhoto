@@ -120,7 +120,7 @@ export default {
 				</div>
 			</div>
 			<div v-if="comments_shown">
-				<div v-for="item of comments_data" class="row">
+				<div v-for="item of comments_data" class="row" v-bind:key="item.comment_id">
 					<div class="col-7 card-body border-top">
 						<b>{{ item.name }}:</b> {{ item.comment }}
 					</div>

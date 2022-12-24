@@ -73,7 +73,7 @@ export default {
 						<label class="form-label" for="formUsername">Search by username</label>
 					</div>
 
-					<div id="main-content" v-for="item of streamData">
+					<div id="main-content" v-for="item of streamData" v-bind:key="item.user_id">
 						<UserCard :user_id="item.user_id" :name="item.name" :followed="item.followed"
 							:banned="item.banned" />
 					</div>
