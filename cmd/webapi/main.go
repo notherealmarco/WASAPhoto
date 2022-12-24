@@ -127,7 +127,6 @@ func run() error {
 		return fmt.Errorf("creating the API server instance: %w", err)
 	}
 
-
 	router := apirouter.Handler()
 
 	router, err = registerWebUI(router)
