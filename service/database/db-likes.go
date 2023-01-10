@@ -96,6 +96,7 @@ func (db *appdbimpl) UnlikePhoto(uid string, photo int64, liker_uid string) (Que
 	// But our DB implementation only requires the photo id.
 	exists, err := db.photoExists(uid, photo)
 	if err != nil || !exists {
+		// The photo does not exist, or the user has been banned
 		return ERR_NOT_FOUND, err
 	}
 
@@ -111,6 +112,7 @@ func (db *appdbimpl) UnlikePhoto(uid string, photo int64, liker_uid string) (Que
 		return ERR_INTERNAL, err
 	}
 
+	// The user was not liking the photo
 	if rows == 0 {
 		return ERR_NOT_FOUND, nil
 	}

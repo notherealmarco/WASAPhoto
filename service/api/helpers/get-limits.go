@@ -6,10 +6,12 @@ import (
 )
 
 const (
-	DEFAULT_LIMIT  = 15
+	DEFAULT_LIMIT  = 30
 	DEFAULT_OFFSET = 0
 )
 
+// Get the start index and limit from the query.
+// If they are not present, use the default values.
 func GetLimits(query url.Values) (int, int, error) {
 
 	limit := DEFAULT_LIMIT

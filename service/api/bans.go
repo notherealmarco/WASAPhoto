@@ -66,6 +66,7 @@ func (rt *_router) PutBan(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.BanUser(uid, banned)
 
 	if err != nil {
@@ -95,6 +96,7 @@ func (rt *_router) DeleteBan(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.UnbanUser(uid, banned)
 
 	if err != nil {

@@ -210,7 +210,7 @@ paths:
                 $ref: "#/components/schemas/generic_response"
               example:
                 status: "Resource not found"
-        '400': # todo: not sure if this is the right error code
+        '400':
           description: Trying to follow a user that does not exist.
           content:
             application/json:

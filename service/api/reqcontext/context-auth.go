@@ -11,9 +11,17 @@ const (
 	USER_NOT_FOUND = 3
 )
 
+// Authorization is the interface for an authorization provider
 type Authorization interface {
+	// Returns the type of the authorization provider
 	GetType() string
+
+	// Returns the ID of the currently logged in user
 	GetUserID() string
+
+	// Checks if the token is valid
 	Authorized(db database.AppDatabase) (AuthStatus, error)
+
+	// Checks if the given user and the currently logged in user are the same user
 	UserAuthorized(db database.AppDatabase, uid string) (AuthStatus, error)
 }

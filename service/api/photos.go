@@ -33,7 +33,6 @@ func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	path := rt.dataPath + "/photos/" + uid + "/" + strconv.FormatInt(photo_id, 10) + ".jpg"
-	// todo: we should check if the body is a valid jpg image
 
 	if err = os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil { // perms = 511
 		helpers.SendInternalError(err, "Error creating directory", w, rt.baseLogger)
@@ -78,7 +77,6 @@ func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if err != nil {
 		helpers.SendInternalError(err, "Error committing transaction", w, rt.baseLogger)
-		//todo: should I roll back?
 		return
 	}
 
@@ -156,7 +154,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		helpers.SendInternalError(err, "Error deleting photo from database", w, rt.baseLogger)
 		return
-	} // todo: maybe let's use a transaction also here
+	}
 
 	if !deleted {
 		helpers.SendNotFound(w, "Photo not found", rt.baseLogger)

@@ -18,7 +18,6 @@ func (db *appdbimpl) PostPhoto(uid string) (DBTransaction, int64, error) {
 		err_rb := tx.Rollback()
 		// If rollback fails, we return the original error plus the rollback error
 		if err_rb != nil {
-			// todo: we are losing track of err_rb here
 			err = fmt.Errorf("Rollback error. Rollback cause: %w", err)
 		}
 
@@ -30,7 +29,6 @@ func (db *appdbimpl) PostPhoto(uid string) (DBTransaction, int64, error) {
 		err_rb := tx.Rollback()
 		// If rollback fails, we return the original error plus the rollback error
 		if err_rb != nil {
-			// todo: we are losing track of err_rb here
 			err = fmt.Errorf("Rollback error. Rollback cause: %w", err)
 		}
 
@@ -66,6 +64,7 @@ func (db *appdbimpl) photoExists(uid string, photo int64) (bool, error) {
 	return cnt > 0, nil
 }
 
+// Check if a given photo owned by a given user exists, and the requesting user is not banned by the author
 func (db *appdbimpl) PhotoExists(uid string, photo int64, requesting_uid string) (bool, error) {
 
 	var cnt int64

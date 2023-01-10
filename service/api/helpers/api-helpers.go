@@ -10,6 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Tries to decode a json, if it fails, it returns Bad Request to the client and the function returns false
+// Otherwise it returns true without sending anything to the client
 func DecodeJsonOrBadRequest(r io.Reader, w http.ResponseWriter, v interface{}, l logrus.FieldLogger) bool {
 
 	err := json.NewDecoder(r).Decode(v)
@@ -20,6 +22,8 @@ func DecodeJsonOrBadRequest(r io.Reader, w http.ResponseWriter, v interface{}, l
 	return true
 }
 
+// Verifies if a user exists, if it doesn't, it returns Not Found to the client and the function returns false
+// Otherwise it returns true without sending anything to the client
 func VerifyUserOrNotFound(db database.AppDatabase, uid string, w http.ResponseWriter, l logrus.FieldLogger) bool {
 
 	user_exists, err := db.UserExists(uid)
@@ -36,6 +40,8 @@ func VerifyUserOrNotFound(db database.AppDatabase, uid string, w http.ResponseWr
 	return true
 }
 
+// Sends a generic status response
+// The response is a json object with a "status" field desribing the status of a request
 func SendStatus(httpStatus int, w http.ResponseWriter, description string, l logrus.FieldLogger) {
 	w.WriteHeader(httpStatus)
 	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
@@ -44,40 +50,29 @@ func SendStatus(httpStatus int, w http.ResponseWriter, description string, l log
 	}
 }
 
+// Sends a Not Found error to the client
 func SendNotFound(w http.ResponseWriter, description string, l logrus.FieldLogger) {
-	w.WriteHeader(http.StatusNotFound)
-	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
-	if err != nil {
-		l.WithError(err).Error("Error encoding json")
-	}
+	SendStatus(http.StatusNotFound, w, description, l)
 }
 
+// Sends a Bad Request error to the client
 func SendBadRequest(w http.ResponseWriter, description string, l logrus.FieldLogger) {
-	w.WriteHeader(http.StatusBadRequest)
-	err := json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
-	if err != nil {
-		l.WithError(err).Error("Error encoding json")
-	}
+	SendStatus(http.StatusBadRequest, w, description, l)
 }
 
+// Sends a Bad Request error to the client and logs the given error
 func SendBadRequestError(err error, description string, w http.ResponseWriter, l logrus.FieldLogger) {
-	w.WriteHeader(http.StatusBadRequest)
 	l.WithError(err).Error(description)
-	err = json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
-	if err != nil {
-		l.WithError(err).Error("Error encoding json")
-	}
+	SendBadRequest(w, description, l)
 }
 
+// Sends an Internal Server Error to the client and logs the given error
 func SendInternalError(err error, description string, w http.ResponseWriter, l logrus.FieldLogger) {
-	w.WriteHeader(http.StatusInternalServerError)
 	l.WithError(err).Error(description)
-	err = json.NewEncoder(w).Encode(structures.GenericResponse{Status: description})
-	if err != nil {
-		l.WithError(err).Error("Error encoding json")
-	}
+	SendStatus(http.StatusInternalServerError, w, description, l)
 }
 
+// Tries to roll back a transaction, if it fails it logs the error
 func RollbackOrLogError(tx database.DBTransaction, l logrus.FieldLogger) {
 	err := tx.Rollback()
 	if err != nil {
@@ -85,6 +80,8 @@ func RollbackOrLogError(tx database.DBTransaction, l logrus.FieldLogger) {
 	}
 }
 
+// Checks if a user is banned by another user, then it returns Not Found to the client and the function returns false
+// Otherwise it returns true whithout sending anything to the client
 func SendNotFoundIfBanned(db database.AppDatabase, uid string, banner string, w http.ResponseWriter, l logrus.FieldLogger) bool {
 	banned, err := db.IsBanned(uid, banner)
 	if err != nil {

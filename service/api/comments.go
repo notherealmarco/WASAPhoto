@@ -55,6 +55,7 @@ func (rt *_router) GetComments(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// send the response
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(comments)
 
 	if err != nil {
