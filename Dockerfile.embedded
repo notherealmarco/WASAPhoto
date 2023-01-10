@@ -1,4 +1,4 @@
-FROM node:lts as builder
+FROM node:lts as ui-builder
 
 ### Copy Vue.js code
 WORKDIR /app
@@ -13,6 +13,7 @@ FROM golang:1.19.1 AS builder
 ### Copy Go code
 WORKDIR /src/
 COPY . .
+COPY --from=ui-builder /app/webui webui
 
 ### Build executables
 RUN go build -tags webui -o /app/webapi ./cmd/webapi
