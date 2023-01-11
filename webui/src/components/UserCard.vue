@@ -3,78 +3,109 @@ export default {
     props: ["user_id", "name", "followed", "banned", "show_new_post"],
     watch: {
         name: function (new_val, old_val) {
-            this.username = new_val;
+            this.username = new_val
         },
         banned: function (new_val, old_val) {
-            this.user_banned = new_val;
+            this.user_banned = new_val
         },
         followed: function (new_val, old_val) {
-            this.user_followed = new_val;
+            this.user_followed = new_val
         },
     },
     data: function () {
         return {
+            // User data
             username: this.name,
             user_followed: this.followed,
             user_banned: this.banned,
+
+            // Whether the user is the currently logged in user
             myself: this.$currentSession() == this.user_id,
+
+            // Whether to show the buttons to post a new photo and update the username
             show_post_form: false,
             show_username_form: false,
+
+            // The new username
             newUsername: "",
+
+            // The file to upload
             upload_file: null,
         }
     },
     methods: {
+        // Logout the user
         logout() {
             this.$root.logout()
         },
+
+        // Visit the user's profile
         visit() {
             this.$router.push({ path: "/profile/" + this.user_id });
         },
+
+        // Follow the user
         follow() {
             this.$axios.put("/users/" + this.user_id + "/followers/" + this.$currentSession())
                 .then(response => {
+                    if (response == null) return // the interceptors returns null if something goes bad
                     this.user_followed = true
                     this.$emit('updateInfo')
                 })
         },
+
+        // Unfollow the user
         unfollow() {
             this.$axios.delete("/users/" + this.user_id + "/followers/" + this.$currentSession())
                 .then(response => {
+                    if (response == null) return
                     this.user_followed = false
                     this.$emit('updateInfo')
                 })
         },
+
+        // Ban the user
         ban() {
             this.$axios.put("/users/" + this.$currentSession() + "/bans/" + this.user_id)
                 .then(response => {
+                    if (response == null) return
                     this.user_banned = true
                     this.$emit('updateInfo')
                 })
         },
+
+        // Unban the user
         unban() {
             this.$axios.delete("/users/" + this.$currentSession() + "/bans/" + this.user_id)
                 .then(response => {
+                    if (response == null) return
                     this.user_banned = false
                     this.$emit('updateInfo')
                 })
         },
+
+        // Prepare the file to upload
         load_file(e) {
             let files = e.target.files || e.dataTransfer.files;
-            if (!files.length) return;
-            this.upload_file = files[0];
+            if (!files.length) return
+            this.upload_file = files[0]
         },
+
+        // Upload the file
         submit_file() {
             this.$axios.post("/users/" + this.$currentSession() + "/photos", this.upload_file)
                 .then(response => {
+                    if (response == null) return
                     this.show_post_form = false
                     this.$emit('updatePosts')
                 })
         },
+
+        // Update the username
         updateUsername() {
             this.$axios.put("/users/" + this.$currentSession() + "/username", { name: this.newUsername })
                 .then(response => {
-                    if (response == null) return; // the interceptors returns null if something goes bad
+                    if (response == null) return
                     this.show_username_form = false
                     this.$emit('updateInfo')
                     this.username = this.newUsername
