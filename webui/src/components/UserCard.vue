@@ -82,8 +82,6 @@ export default {
                 })
         },
     },
-    mounted() {
-    },
 }
 </script>
 <template>
