@@ -2,25 +2,42 @@
 export default {
 	data: function () {
 		return {
+			// Whether the content is loading
+			// to show the loading spinner
 			loading: false,
+
+			// Stream data from the server
 			stream_data: [],
+
+			// Whether the data has ended
+			// to stop loading more data with the infinite scroll
 			data_ended: false,
+
+			// Parameters to load data dynamically when scrolling
 			start_idx: 0,
 			limit: 1,
+
+			// Shows the retry button
 			loadingError: false,
 		}
 	},
 	methods: {
+		// Reload the whole page content
+		// fetching it again from the server
 		async refresh() {
-			// this way we are sure that we fill the first page
-			// 450 is a bit more of the max height of a post
-			// todo: may not work in 4k screens :/
+			// Limits the number of posts to load based on the window height
+			// to avoid loading too many posts at once
+			// 450px is (a bit more) of the height of a single post
 			this.limit = Math.round(window.innerHeight / 450);
+
+			// Reset the parameters and the data
 			this.start_idx = 0;
 			this.data_ended = false;
 			this.stream_data = [];
 			this.loadContent();
 		},
+
+		// Requests data from the server asynchronously
 		async loadContent() {
 			this.loading = true;
 
@@ -33,17 +50,30 @@ export default {
 				return
 			}
 
+			// If the response is empty or shorter than the limit
+			// then there is no more data to load
 			if (response.data.length == 0 || response.data.length < this.limit) this.data_ended = true;
 			this.stream_data = this.stream_data.concat(response.data);
+
+			// Finished loading, hide the spinner
 			this.loading = false;
 		},
+
+		// Loads more data when the user scrolls down
+		// (this is called by the IntersectionObserver component)
 		loadMore() {
+			// Avoid loading more content if the data has ended
 			if (this.loading || this.data_ended) return
+
+			// Increase the start index and load more content
 			this.start_idx += this.limit
 			this.loadContent()
 		},
 	},
+
+	// Called when the view is mounted
 	mounted() {
+		// Start loading the content
 		this.refresh();
 	}
 }
@@ -66,7 +96,7 @@ export default {
 							:comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>
 
-					<div v-if="data_ended" class="alert alert-secondary text-center" role="alert">
+					<div v-if="(data_ended && !(stream_data.length == 0))" class="alert alert-secondary text-center" role="alert">
 						This is the end of your stream. Hooray! 👻
 					</div>
 

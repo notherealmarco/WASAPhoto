@@ -3,12 +3,19 @@ export default {
 	props: ["user_id", "name", "date", "comments", "likes", "photo_id", "liked"],
 	data: function () {
 		return {
+			// Data for the modal
 			modalTitle: "Modal Title",
 			modalMsg: "Modal Message",
+
+			// Whether the user is logged in
 			logged_in: true,
 		}
 	},
 	methods: {
+		// Function to show a modal
+		// can be called by any view or component
+		// title: title of the modal
+		// message: message to show in the modal
 		showModal(title, message) {
 			this.modalTitle = title
 			this.modalMsg = message
@@ -16,9 +23,14 @@ export default {
 			// Simulate a click on the hidden modal button to open it
 			this.$refs.openModal.click()
 		},
+
+		// Sets the login status to true
+		// to show the navigation buttons
 		setLoggedIn() {
 			this.logged_in = true
 		},
+
+		// Disconnects the current logged in user
 		logout() {
 			localStorage.removeItem("token")
             sessionStorage.removeItem("token")
@@ -27,6 +39,7 @@ export default {
 		}
 	},
 
+	// Called when the root view is mounted
 	mounted() {
 		// Check if the user is already logged in
 		this.$axiosUpdate()
