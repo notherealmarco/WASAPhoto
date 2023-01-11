@@ -58,10 +58,13 @@ func (db *appdbimpl) CreateUser(name string) (string, error) {
 		return "", errors.New("username already exists")
 	}
 
+	// create new user id
 	uid, err := uuid.NewV4()
 	if err != nil {
 		return "", err
 	}
+
+	// insert the new user into the database
 	_, err = db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid.String(), name)
 	return uid.String(), err
 }

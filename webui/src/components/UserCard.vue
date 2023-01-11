@@ -75,6 +75,7 @@ export default {
         updateUsername() {
             this.$axios.put("/users/" + this.$currentSession() + "/username", { name: this.newUsername })
                 .then(response => {
+                    if (response == null) return; // the interceptors returns null if something goes bad
                     this.show_username_form = false
                     this.$emit('updateInfo')
                     this.username = this.newUsername
