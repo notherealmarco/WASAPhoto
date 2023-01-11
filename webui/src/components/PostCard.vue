@@ -96,7 +96,7 @@ export default {
 			<div class="row">
 				<div class="col-10">
 					<div class="card-body">
-						<h5 @click="visitUser" class="card-title" style="cursor: pointer">{{ name }}</h5>
+						<h5 @click="visitUser" class="card-title d-inline-block" style="cursor: pointer">{{ name }}</h5>
 						<p class="card-text">{{ new Date(Date.parse(date)) }}</p>
 					</div>
 				</div>
