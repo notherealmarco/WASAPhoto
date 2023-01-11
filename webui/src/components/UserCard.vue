@@ -15,7 +15,6 @@ export default {
     data: function () {
         return {
             username: this.name,
-            errorMsg: "aaa",
             user_followed: this.followed,
             user_banned: this.banned,
             myself: this.$currentSession() == this.user_id,
