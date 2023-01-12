@@ -42,7 +42,7 @@ func (db *appdbimpl) UserExistsNotBanned(uid string, requesting_uid string) (boo
 // Get user id by username
 func (db *appdbimpl) GetUserID(name string) (string, error) {
 	var uid string
-	err := db.c.QueryRow(`SELECT "uid" FROM "users" WHERE "name" = ?`, name).Scan(&uid)
+	err := db.c.QueryRow(`SELECT "uid" FROM "users" WHERE "name" LIKE ?`, name).Scan(&uid)
 	return uid, err
 }
 
