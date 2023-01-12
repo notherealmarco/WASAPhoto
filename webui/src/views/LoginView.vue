@@ -106,8 +106,7 @@ export default {
                                 @click="login">Sign in</button>
                             <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
                             <LoadingSpinner :loading="loading" />
-                            <i class="text-center text-secondary d-flex flex-column">repeat after me: "best password is
-                                no password"</i>
+                            <i class="text-center text-secondary d-flex flex-column">share your special moments!</i>
                         </form>
                     </div>
                 </div>
