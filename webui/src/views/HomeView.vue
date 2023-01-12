@@ -34,6 +34,8 @@ export default {
 			this.start_idx = 0;
 			this.data_ended = false;
 			this.stream_data = [];
+
+			// Fetch the first batch of posts
 			this.loadContent();
 		},
 
@@ -86,27 +88,36 @@ export default {
 				<div class="col-xl-6 col-lg-9">
 					<h3 class="card-title border-bottom mb-4 pb-2 text-center">Your daily WASAStream!</h3>
 
+					<!-- Show a message if there's no content to show -->
 					<div v-if="(stream_data.length == 0)" class="alert alert-secondary text-center" role="alert">
 						There's nothing here 😢
 						<br />Why don't you start following somebody? 👻
 					</div>
 
+					<!-- The stream -->
 					<div id="main-content" v-for="item of stream_data" v-bind:key="item.photo_id">
+						<!-- PostCard for each photo -->
 						<PostCard :user_id="item.user_id" :photo_id="item.photo_id" :name="item.name" :date="item.date"
 							:comments="item.comments" :likes="item.likes" :liked="item.liked" />
 					</div>
 
+					<!-- Show a message if there's no more content to show -->
 					<div v-if="(data_ended && !(stream_data.length == 0))" class="alert alert-secondary text-center" role="alert">
 						This is the end of your stream. Hooray! 👻
 					</div>
 
+					<!-- The loading spinner -->
 					<LoadingSpinner :loading="loading" /><br />
 
 					<div class="d-flex align-items-center flex-column">
+						<!-- Retry button -->
 						<button v-if="loadingError" @click="refresh" class="btn btn-secondary w-100 py-3">Retry</button>
 
+						<!-- Load more button -->
 						<button v-if="(!data_ended && !loading)" @click="loadMore" class="btn btn-secondary py-1 mb-5"
 							style="border-radius: 15px">Load more</button>
+
+						<!-- The IntersectionObserver for dynamic loading -->
 						<IntersectionObserver sentinal-name="load-more-home" @on-intersection-element="loadMore" />
 					</div>
 				</div>

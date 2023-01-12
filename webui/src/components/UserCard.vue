@@ -127,6 +127,7 @@ export default {
                     </div>
                 </div>
 
+                <!-- Whether to show one or two rows -->
                 <div class="d-flex flex-column" v-bind:class="{
                                                 'col-12': (myself && show_new_post),
                                                 'col-sm-7': (myself && show_new_post),
@@ -135,6 +136,7 @@ export default {
                                                 'align-items-sm-end': (myself && show_new_post),
                                             }">
 
+                    <!-- Buttons -->
                     <div class="card-body d-flex">
                         <div v-if="!myself" class="d-flex">
                             <button v-if="!user_banned" @click="ban" type="button"
@@ -146,17 +148,26 @@ export default {
                             <button v-if="user_followed" @click="unfollow" type="button"
                                 class="btn btn-outline-primary">Following</button>
                         </div>
+
+                        <!-- Users cannot follow or ban themselves -->
                         <div v-if="(myself && !show_new_post)">
                             <button disabled type="button" class="btn btn-secondary">Yourself</button>
                         </div>
+
+                        <!-- Logout button -->
                         <div v-if="(myself && show_new_post)" class="col">
                             <button type="button" class="btn btn-outline-danger me-2" @click="logout">Logout</button>
                         </div>
+
                         <div class="d-flex col justify-content-end flex-row">
+
+                            <!-- Update username button -->
                             <div v-if="(myself && show_new_post)" class="">
                                 <button v-if="!show_username_form" type="button" class="btn btn-outline-secondary me-2"
                                     @click="show_username_form = true">Username</button>
                             </div>
+
+                            <!-- Post a new photo button -->
                             <div v-if="(myself && show_new_post)" class="">
                                 <button v-if="!show_post_form" type="button" class="btn btn-primary"
                                     @click="show_post_form = true">Post</button>
@@ -165,6 +176,8 @@ export default {
                     </div>
                 </div>
             </div>
+
+            <!-- File input -->
             <div class="row" v-if="show_post_form">
                 <div class="col-9">
                     <div class="card-body h-100 d-flex align-items-center">
@@ -172,13 +185,18 @@ export default {
                     </div>
                 </div>
 
+                <!-- Publish button -->
                 <div class="col-3">
                     <div class="card-body d-flex justify-content-end">
                         <button type="button" class="btn btn-primary btn-lg" @click="submit_file">Publish</button>
                     </div>
                 </div>
             </div>
+
+            <!-- New username form -->
             <div class="row" v-if="show_username_form">
+
+                <!-- Username input -->
                 <div class="col-10">
                     <div class="card-body h-100 d-flex align-items-center">
                         <input v-model="newUsername" class="form-control form-control-lg" id="formUsername"
@@ -186,6 +204,7 @@ export default {
                     </div>
                 </div>
 
+                <!-- Username update button -->
                 <div class="col-2">
                     <div class="card-body d-flex justify-content-end">
                         <button type="button" class="btn btn-primary btn-lg" @click="updateUsername">Set</button>

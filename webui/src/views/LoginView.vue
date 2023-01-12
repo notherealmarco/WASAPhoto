@@ -2,18 +2,26 @@
 export default {
     data: function () {
         return {
+            // The error message to display
             errormsg: null,
+
+            // Loading spinner state
             loading: false,
-            some_data: null,
+
+            // Form inputs
             field_username: "",
             rememberLogin: false,
         };
     },
     methods: {
+        // Send the login request to the server
+        // if the login is successful, the token is saved
+        // and the user is redirected to the previous page
         async login() {
             this.loading = true;
             this.errormsg = null;
 
+            // Send the login request
             let response = await this.$axios.post("/session", {
                 name: this.field_username,
             });
@@ -24,6 +32,7 @@ export default {
 				return
 			}
 
+            // If the login is successful, save the token and redirect to the previous page
             if (response.status == 201 || response.status == 200) {
                 // Save the token in the local storage if the user wants to be remembered
                 if (this.rememberLogin) {
@@ -44,9 +53,10 @@ export default {
                 this.$router.go(-1);
             }
             else {
+                // Login failed, show the error message
                 this.errormsg = response.data["error"];
             }
-
+            // Disable the loading spinner
             this.loading = false;
         },
     },
@@ -54,6 +64,7 @@ export default {
 </script>
 
 <template>
+    <!-- Login form centered in the page -->
     <div class="vh-100 container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <!--<div class="col-sm"><h2>* immagina un logo carino *</h2></div>-->

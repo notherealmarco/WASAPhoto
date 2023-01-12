@@ -116,6 +116,8 @@ export default {
 
 <template>
 	<div class="card mb-5">
+
+		<!-- Image container div -->
 		<div ref="imageContainer">
 			<div v-if="!imageReady" class="mt-3 mb-3">
 				<LoadingSpinner :loading="!imageReady" />
@@ -124,6 +126,8 @@ export default {
 
 		<div class="container">
 			<div class="row">
+
+				<!-- Username and date -->
 				<div class="col-10">
 					<div class="card-body">
 						<h5 @click="visitUser" class="card-title d-inline-block" style="cursor: pointer">{{ name }}</h5>
@@ -131,9 +135,9 @@ export default {
 					</div>
 				</div>
 
+				<!-- Comment and like buttons -->
 				<div class="col-2">
 					<div class="card-body d-flex justify-content-end" style="display: inline-flex">
-						<!-- not quite sure flex is the right property, but it works -->
 						<a @click="showHideComments">
 							<h5><i class="card-title bi bi-chat-right pe-1"></i></h5>
 						</a>
@@ -149,6 +153,8 @@ export default {
 					</div>
 				</div>
 			</div>
+
+			<!-- Comments section -->
 			<div v-if="comments_shown">
 				<div v-for="item of comments_data" class="row" v-bind:key="item.comment_id">
 					<div class="col-7 card-body border-top">
@@ -158,13 +164,21 @@ export default {
 						{{ new Date(Date.parse(item.date)).toDateString() }}
 					</div>
 				</div>
+
+				<!-- Show more comments label -->
 				<div v-if="!data_ended" class="col-12 card-body text-end pt-0 pb-1 px-0">
 					<a @click="getComments" class="text-primary">Mostra altro...</a>
 				</div>
+
+				<!-- New comment form -->
 				<div class="row">
+
+					<!-- Comment input -->
 					<div class="col-10 card-body border-top text-end">
 						<input v-model="commentMsg" type="text" class="form-control" placeholder="Commenta...">
 					</div>
+
+					<!-- Comment publish button -->
 					<div class="col-1 card-body border-top text-end ps-0 d-flex">
 						<button style="width: 100%" type="button" class="btn btn-primary"
 							@click="postComment">Go</button>
