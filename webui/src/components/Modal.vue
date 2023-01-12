@@ -5,8 +5,8 @@
 </script>
 
 <template>
-    <!-- Button trigger modal -->
-    <!-- Modal -->
+    <!-- This components renders a Bootstrap modal -->
+    <!-- The modal contains a title and a message -->
     <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -19,7 +19,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <!--<button type="button" class="btn btn-primary">Save changes</button>-->
                 </div>
             </div>
         </div>
