@@ -5,6 +5,7 @@ export default {
 </script>
 
 <template>
+	<!-- This component renders a loading spinner if the loading prop is true -->
 	<div v-if="loading">
 		<div style="text-align: center">
 			<div class="spinner-grow" role="status">
