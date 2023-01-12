@@ -4,7 +4,7 @@
 
 *Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto!*
 
-*You canupload your photos directly from your PC, and they will be visible to everyone following you.*
+*You can upload your photos directly from your PC, and they will be visible to everyone following you.*
 
 (Live demo: [https://wasaphoto.marcorealacci.me](https://wasaphoto.marcorealacci.me))
 
@@ -22,4 +22,4 @@ This is my project for the Web And Software Architecture (WASA) class
 * Dockerfiles to deploy the backend and the frontend in a contaner.
   * Dockerfile.backend builds the container for the backend
   * Dockerfile.frontend builds the container for the frontend
-  * Dockerfile.embedded builds a container which a backend which also delives the frontend
+  * Dockerfile.embedded builds the backend container, but the backend's webserver also delivers the frontend
