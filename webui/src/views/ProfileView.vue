@@ -112,20 +112,7 @@ export default {
 						@updateInfo="getMainData" @updatePosts="refresh" />
 
 					<!-- Photos, followers and following counters -->
-					<div class="row text-center mt-2 mb-3">
-						<div class="col-4" style="border-right: 1px">
-							<h3>{{ user_data["photos"] }}</h3>
-							<h6>Photos</h6>
-						</div>
-						<div class="col-4">
-							<h3>{{ user_data["followers"] }}</h3>
-							<h6>Followers</h6>
-						</div>
-						<div class="col-4">
-							<h3>{{ user_data["following"] }}</h3>
-							<h6>Following</h6>
-						</div>
-					</div>
+					<ProfileCounters :user_data="user_data" />
 
 					<!-- Photos -->
 					<div id="main-content" v-for="item of stream_data" v-bind:key="item.photo_id">

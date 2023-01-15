@@ -4,7 +4,7 @@
         methods: {
 		    // Visit the user's profile
             showModal() {
-                this.$refs.openModal.click();
+                this.$refs['open' + this.id].click();
             },
         },
     }
@@ -15,7 +15,7 @@
     <!-- The modal contains a title and a message -->
 
     <!-- Invisible button to open the modal -->
-    <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#errorModal" />
+    <button :ref="'open' + id" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" :data-bs-target="'#' + id" />
 
     <!-- Modal -->
     <div class="modal fade" :id="id" tabindex="-1" :aria-labelledby="id + 'Label'" aria-hidden="true">
