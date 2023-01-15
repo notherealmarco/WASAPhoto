@@ -26,7 +26,7 @@ export default {
 	watch: {
 		'$route.params.user_id': {
 			handler: function (user_id) {
-				this.refresh()
+				if (user_id !== null && user_id !== undefined) this.refresh()
 			},
 			deep: true,
 			immediate: true
