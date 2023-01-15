@@ -1,6 +1,7 @@
 <script>
 export default {
     props: ["user_data"],
+
     data: function () {
         return {
             modal_data: [],
@@ -19,7 +20,6 @@ export default {
         // Visit the profile of the user with the given id
         visit(user_id) {
             this.$router.push({ path: "/profile/" + user_id })
-            location.reload()
         },
 
         // Reset the current data and fetch the first batch of users
@@ -75,7 +75,7 @@ export default {
     <Modal ref="mymodal" id="userModal" :title="data_type">
         <ul>
             <li v-for="item in modal_data" :key="item.user_id" class="mb-2" style="cursor: pointer"
-                @click="visit(item.user_id)">
+                @click="visit(item.user_id)" data-bs-dismiss="modal">
                 <h5>{{ item.name }}</h5>
             </li>
             <IntersectionObserver sentinal-name="load-more-users" @on-intersection-element="loadMore" />

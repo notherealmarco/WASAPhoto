@@ -11,6 +11,9 @@ export default {
         followed: function (new_val, old_val) {
             this.user_followed = new_val
         },
+        user_id: function (new_val, old_val) {
+            this.myself = this.$currentSession() == new_val
+        },
     },
     data: function () {
         return {

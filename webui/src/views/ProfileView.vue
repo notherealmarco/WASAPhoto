@@ -23,23 +23,41 @@ export default {
 			limit: 1,
 		};
 	},
+	watch: {
+		'$route.params.user_id': {
+			handler: function (user_id) {
+				this.refresh()
+			},
+			deep: true,
+			immediate: true
+		}
+	},
 	methods: {
 		async refresh() {
+			if (this.$route.params.user_id == "me") {
+				// If the id is "me", show the current user's profile
+				this.requestedProfile = this.$currentSession()
+			}
+			else {
+				// Otherwise, show "id"'s profile
+				this.requestedProfile = this.$route.params.user_id
+			}
+
 			// Fetch profile info from the server
-			this.getMainData();
+			this.getMainData()
 
 			// Limits the number of posts to load based on the window height
 			// to avoid loading too many posts at once
 			// 450px is (a bit more) of the height of a single post
-			this.limit = Math.max(Math.round(window.innerHeight / 450), 1);
+			this.limit = Math.max(Math.round(window.innerHeight / 450), 1)
 
 			// Reset the parameters and the data
-			this.start_idx = 0;
-			this.data_ended = false;
-			this.stream_data = [];
+			this.start_idx = 0
+			this.data_ended = false
+			this.stream_data = []
 
 			// Fetch the first batch of posts
-			this.loadContent();
+			this.loadContent()
 		},
 
 		// Fetch profile info from the server
@@ -47,17 +65,17 @@ export default {
 			let response = await this.$axios.get("/users/" + this.requestedProfile);
 			if (response == null) {
 				// An error occurred, set the error flag
-				this.loading = false;
-				this.loadingError = true;
-				return;
+				this.loading = false
+				this.loadingError = true
+				return
 			}
-			this.user_data = response.data;
+			this.user_data = response.data
 		},
 
 		// Fetch photos from the server
 		async loadContent() {
 			this.loading = true;
-			let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit);
+			let response = await this.$axios.get("/users/" + this.requestedProfile + "/photos" + "?start_index=" + this.start_idx + "&limit=" + this.limit)
 			if (response == null) return // An error occurred. The interceptor will show a modal
 
 			// If the server returned less elements than requested,
@@ -83,17 +101,8 @@ export default {
 		},
 	},
 	created() {
-		if (this.$route.params.user_id == "me") {
-			// If the id is "me", show the current user's profile
-			this.requestedProfile = this.$currentSession();
-		}
-		else {
-			// Otherwise, show "id"'s profile
-			this.requestedProfile = this.$route.params.user_id;
-		}
-
 		// Fetch the profile info and the first batch of photos
-		this.refresh();
+		this.refresh()
 	},
 	components: { IntersectionObserver }
 }
