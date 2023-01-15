@@ -1,25 +1,36 @@
 <script>
     export default {
-        props: ["message", "title"],
+        props: ["id", "title"],
+        methods: {
+		    // Visit the user's profile
+            showModal() {
+                this.$refs.openModal.click();
+            },
+        },
     }
 </script>
 
 <template>
     <!-- This components renders a Bootstrap modal -->
     <!-- The modal contains a title and a message -->
-    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+
+    <!-- Invisible button to open the modal -->
+    <button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#errorModal" />
+
+    <!-- Modal -->
+    <div class="modal fade" :id="id" tabindex="-1" :aria-labelledby="id + 'Label'" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
 
                     <!-- Modal title -->
-                    <h5 class="modal-title" id="modalLabel">{{ title }}</h5>
+                    <h5 class="modal-title" :id="id + 'Label'">{{ title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    {{ message }}
+                    <slot />
                 </div>
 
                 <!-- Footer with close button -->

@@ -17,11 +17,12 @@ export default {
 		// title: title of the modal
 		// message: message to show in the modal
 		showModal(title, message) {
+			// Set the modal data
 			this.modalTitle = title
 			this.modalMsg = message
 
-			// Simulate a click on the hidden modal button to open it
-			this.$refs.openModal.click()
+			// Show the modal
+			this.$refs.errModal.showModal()
 		},
 
 		// Sets the login status to true
@@ -70,10 +71,10 @@ export default {
 </script>
 
 <template>
-	<!-- Invisible button to open the modal -->
-	<button ref="openModal" type="button" class="btn btn-primary" style="display: none" data-bs-toggle="modal" data-bs-target="#modal" />
 	<!-- Modal to show error messages -->
-	<Modal :title="modalTitle" :message="modalMsg" />
+	<Modal ref="errModal" id="errorModal" :title="modalTitle">
+		{{ modalMsg }}
+	</Modal>
 
 	<div class="container-fluid">
 		<div class="row">
