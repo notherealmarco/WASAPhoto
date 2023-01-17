@@ -100,11 +100,6 @@ export default {
 			this.loadContent()
 		},
 	},
-	created() {
-		// Fetch the profile info and the first batch of photos
-		this.refresh()
-	},
-	components: { IntersectionObserver }
 }
 </script>
 

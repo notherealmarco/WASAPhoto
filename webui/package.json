@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"scripts": {
 		"dev": "vite",
+		"dev-backend": "vite --mode development-backend",
 		"build-dev": "vite build --mode development",
 		"build-prod": "vite build --mode production",
 		"build-embed": "vite build --mode production --base=/dashboard/",
