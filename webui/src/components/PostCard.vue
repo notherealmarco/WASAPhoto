@@ -64,7 +64,7 @@ export default {
 				"/comments?limit=5&start_index=" + this.comments_start_idx).then(response => {
 
 					// If there are no more comments, set the flag
-					if (response.data.length == 0) this.data_ended = true;
+					if (response.data.length == 0 || response.data.length < 5) this.data_ended = true;
 
 					// Otherwise increment the start index
 					else this.comments_start_idx += 5;
@@ -167,7 +167,7 @@ export default {
 
 				<!-- Show more comments label -->
 				<div v-if="!data_ended" class="col-12 card-body text-end pt-0 pb-1 px-0">
-					<a @click="getComments" class="text-primary">Mostra altro...</a>
+					<a @click="getComments" class="text-primary">Show more comments...</a>
 				</div>
 
 				<!-- New comment form -->
