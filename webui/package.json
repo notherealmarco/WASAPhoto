@@ -3,11 +3,10 @@
 	"version": "0.0.0",
 	"scripts": {
 		"dev": "vite",
-		"dev-backend": "vite --mode development-backend",
+		"dev-extern-backend": "vite --mode developement-external",
 		"build-dev": "vite build --mode development",
 		"build-prod": "vite build --mode production",
 		"build-embed": "vite build --mode production --base=/dashboard/",
-		"build-embed-host": "vite build --mode embedded --base=/dashboard/",
 		"preview": "vite preview --port 4173"
 	},
 	"dependencies": {

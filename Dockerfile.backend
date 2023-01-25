@@ -19,4 +19,4 @@ WORKDIR /app/
 COPY --from=builder /app/webapi ./
 
 ### Executable command
-CMD ["/app/webapi"]
+CMD ["/app/webapi", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]

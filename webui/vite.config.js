@@ -13,7 +13,7 @@ export default defineConfig(({command, mode, ssrBuild}) => {
 			}
 		},
 	};
-	if (command === 'serve' && mode !== 'development-backend') {
+	if (command === 'serve' && mode !== 'developement-external') {
 		ret.define = {
 			"__API_URL__": JSON.stringify("http://localhost:3000"),
 		};
@@ -21,13 +21,9 @@ export default defineConfig(({command, mode, ssrBuild}) => {
 		ret.define = {
 			"__API_URL__": JSON.stringify("/"),
 		};
-	} else if (mode === 'development-backend') {
-		ret.define = {
-			"__API_URL__": JSON.stringify("https://wasaphoto.marcorealacci.me"),
-		};
 	} else {
 		ret.define = {
-			"__API_URL__": JSON.stringify("http://localhost:3000"),
+			"__API_URL__": JSON.stringify("<your API URL>"),
 		};
 	}
 	return ret;
