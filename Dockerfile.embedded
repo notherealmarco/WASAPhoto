@@ -6,6 +6,7 @@ COPY webui webui
 
 ### Build Vue.js into plain HTML/CSS/JS
 WORKDIR /app/webui
+RUN npm i
 RUN npm run build-embed
 
 FROM golang:1.19.1 AS builder
