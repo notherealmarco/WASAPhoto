@@ -5,8 +5,6 @@ import (
 	"github.com/notherealmarco/WASAPhoto/service/structures"
 )
 
-//this should be changed, but we need to change OpenAPI first
-
 // Get user profile, including username, followers, following, and photos
 func (db *appdbimpl) GetUserProfile(uid string, requesting_uid string) (QueryResult, *structures.UserProfile, error) {
 	// Get user info

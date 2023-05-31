@@ -1,0 +1,34 @@
+FROM node:lts as ui-builder
+
+### Copy Vue.js code
+WORKDIR /app
+COPY webui webui
+
+### Build Vue.js into plain HTML/CSS/JS
+WORKDIR /app/webui
+RUN npm i
+RUN npm run build-embed
+
+FROM golang:1.19.1 AS builder
+
+### Copy Go code
+WORKDIR /src/
+COPY . .
+COPY --from=ui-builder /app/webui webui
+
+### Build executables
+RUN go build -tags webui -o /app/webapi ./cmd/webapi
+
+
+### Create final container
+FROM debian:bullseye
+
+### Inform Docker about which port is used
+EXPOSE 3000 4000
+
+### Copy the build executable from the builder image
+WORKDIR /app/
+COPY --from=builder /app/webapi ./
+
+### Executable command
+CMD ["/app/webapi", "--db-filename", "/data/wasaphoto.db", "--data-path", "/data/data"]

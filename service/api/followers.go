@@ -79,6 +79,7 @@ func (rt *_router) PutFollow(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.FollowUser(follower, uid)
 
 	if err != nil {
@@ -109,6 +110,7 @@ func (rt *_router) DeleteFollow(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.UnfollowUser(follower, uid)
 
 	if err != nil {

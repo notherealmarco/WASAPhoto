@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/notherealmarco/WASAPhoto/service/api/authorization"
@@ -32,36 +33,50 @@ func (rt *_router) PostPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	path := rt.dataPath + "/photos/" + uid + "/" + strconv.FormatInt(photo_id, 10) + ".jpg"
-	// todo: we should check if the body is a valid jpg image
 
 	if err = os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil { // perms = 511
 		helpers.SendInternalError(err, "Error creating directory", w, rt.baseLogger)
 		return
 	}
 
-	file, err := os.Create(path)
+	/*file, err := os.Create(path)
 	if err != nil {
 		helpers.SendInternalError(err, "Error creating file", w, rt.baseLogger)
 		helpers.RollbackOrLogError(transaction, rt.baseLogger)
 		return
+	}*/
+
+	bytes, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		helpers.SendInternalError(err, "Error checking the file", w, rt.baseLogger)
+		helpers.RollbackOrLogError(transaction, rt.baseLogger)
+		return
 	}
 
-	if _, err = io.Copy(file, r.Body); err != nil {
+	mimeType := http.DetectContentType(bytes)
+
+	if !strings.HasPrefix(mimeType, "image/") {
+		helpers.SendStatus(http.StatusBadRequest, w, mimeType+" file is not a valid image", rt.baseLogger)
+		helpers.RollbackOrLogError(transaction, rt.baseLogger)
+		return
+	}
+
+	if err = os.WriteFile(path, bytes, 0644); err != nil {
 		helpers.SendInternalError(err, "Error writing the file", w, rt.baseLogger)
 		helpers.RollbackOrLogError(transaction, rt.baseLogger)
 		return
 	}
 
-	if err = file.Close(); err != nil {
+	/*if err = file.Close(); err != nil {
 		helpers.SendInternalError(err, "Error closing file", w, rt.baseLogger)
 		helpers.RollbackOrLogError(transaction, rt.baseLogger)
-	}
+	}*/
 
 	err = transaction.Commit()
 
 	if err != nil {
 		helpers.SendInternalError(err, "Error committing transaction", w, rt.baseLogger)
-		//todo: should I roll back?
 		return
 	}
 
@@ -139,7 +154,7 @@ func (rt *_router) DeletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		helpers.SendInternalError(err, "Error deleting photo from database", w, rt.baseLogger)
 		return
-	} // todo: maybe let's use a transaction also here
+	}
 
 	if !deleted {
 		helpers.SendNotFound(w, "Photo not found", rt.baseLogger)

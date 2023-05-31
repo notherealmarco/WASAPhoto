@@ -66,6 +66,7 @@ func (rt *_router) PutBan(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.BanUser(uid, banned)
 
 	if err != nil {
@@ -83,6 +84,13 @@ func (rt *_router) PutBan(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 
+	// Removes the banning user to the banned user's followers (if present)
+	_, err = rt.db.UnfollowUser(banned, uid)
+
+	if err != nil {
+		helpers.SendInternalError(err, "Database error: UnfollowUser", w, rt.baseLogger)
+	}
+
 	helpers.SendStatus(http.StatusCreated, w, "Success", rt.baseLogger)
 }
 
@@ -95,6 +103,7 @@ func (rt *_router) DeleteBan(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// Execute the query
 	status, err := rt.db.UnbanUser(uid, banned)
 
 	if err != nil {

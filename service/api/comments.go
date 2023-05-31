@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -56,6 +55,7 @@ func (rt *_router) GetComments(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// send the response
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(comments)
 
 	if err != nil {
@@ -89,15 +89,7 @@ func (rt *_router) PostComment(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// check if the comment is valid (should not contain newlines and at be between 5 and 255 characters)
-	stat, err := regexp.Match(`^[*]{5, 255}$`, []byte(request_body.Comment))
-
-	if err != nil {
-		helpers.SendInternalError(err, "Error matching regex", w, rt.baseLogger)
-		return
-	}
-
-	if !stat {
-		helpers.SendBadRequest(w, "Invalid comment", rt.baseLogger)
+	if !helpers.MatchCommentOrBadRequest(request_body.Comment, w, rt.baseLogger) {
 		return
 	}
 

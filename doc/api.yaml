@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.0.2
 info:
   title: WASAPhoto API
   description: |-
@@ -210,7 +210,7 @@ paths:
                 $ref: "#/components/schemas/generic_response"
               example:
                 status: "Resource not found"
-        '400': # todo: not sure if this is the right error code
+        '400':
           description: Trying to follow a user that does not exist.
           content:
             application/json:
@@ -920,6 +920,7 @@ components:
       maxLength: 36
       description: The user ID.
       format: uuid
+      pattern: '^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$' # RFC 4122
       example: "1b4e28ba-2fa1-11d2-883f-0016d3cca427"
     name_object:
       type: object
@@ -1080,9 +1081,9 @@ components:
         comment:
           $ref: "#/components/schemas/comment"
     comment:
-      minLength: 5
+      minLength: 1
       maxLength: 255
-      pattern: ".*" #everything except newlines ^[*]{5, 255}$
+      pattern: "^(.){1,255}$" # everything except newlines
       type: string
       example: "What a lovely picture! 😊"
       description: The comment's text
@@ -1092,7 +1093,7 @@ components:
       format: binary
       minLength: 1
       maxLength: 10485760 # 10 MB
-      pattern: "((.|\n)*)" # todo: review. Btw this means "any string"
+      pattern: "((.|\n)*)" # this accepts everything
 
     generic_response:
       type: object

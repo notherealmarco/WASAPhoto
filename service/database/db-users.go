@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/gofrs/uuid"
 	"github.com/notherealmarco/WASAPhoto/service/database/db_errors"
@@ -41,27 +42,56 @@ func (db *appdbimpl) UserExistsNotBanned(uid string, requesting_uid string) (boo
 // Get user id by username
 func (db *appdbimpl) GetUserID(name string) (string, error) {
 	var uid string
-	err := db.c.QueryRow(`SELECT "uid" FROM "users" WHERE "name" = ?`, name).Scan(&uid)
+	err := db.c.QueryRow(`SELECT "uid" FROM "users" WHERE "name" LIKE ?`, name).Scan(&uid)
 	return uid, err
 }
 
 // Create a new user
 func (db *appdbimpl) CreateUser(name string) (string, error) {
+
+	// check if username is taken (case insensitive)
+	exists, err := db.nameExists(name)
+
+	if err != nil {
+		return "", err
+	} else if exists {
+		return "", errors.New("username already exists")
+	}
+
+	// create new user id
 	uid, err := uuid.NewV4()
 	if err != nil {
 		return "", err
 	}
+
+	// insert the new user into the database
 	_, err = db.c.Exec(`INSERT INTO "users" ("uid", "name") VALUES (?, ?)`, uid.String(), name)
 	return uid.String(), err
 }
 
+// Check if username exists
+func (db *appdbimpl) nameExists(name string) (bool, error) {
+	var cnt int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM "users" WHERE "name" LIKE ?`, name).Scan(&cnt)
+	if err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
 // Update username
 func (db *appdbimpl) UpdateUsername(uid string, name string) (QueryResult, error) {
-	_, err := db.c.Exec(`UPDATE "users" SET "name" = ? WHERE "uid" = ?`, name, uid)
 
-	if db_errors.UniqueViolation(err) {
+	// check if username is taken (case insensitive)
+	exists, err := db.nameExists(name)
+
+	if err != nil {
+		return ERR_INTERNAL, err
+	} else if exists {
 		return ERR_EXISTS, nil
 	}
+
+	_, err = db.c.Exec(`UPDATE "users" SET "name" = ? WHERE "uid" = ?`, name, uid)
 
 	if err != nil {
 		return ERR_INTERNAL, err
@@ -95,7 +125,7 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 
 							AND "followed" = ?
 							LIMIT ?
-							OFFSET ?`, uid, requesting_uid, limit, start_index)
+							OFFSET ?`, requesting_uid, uid, limit, start_index)
 
 	followers, err := db.uidNameQuery(rows, err)
 
@@ -107,7 +137,7 @@ func (db *appdbimpl) GetUserFollowers(uid string, requesting_uid string, start_i
 }
 
 // Get user following
-func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_index int, offset int) (QueryResult, *[]structures.UIDName, error) {
+func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_index int, limit int) (QueryResult, *[]structures.UIDName, error) {
 
 	// user may exist but have no followers
 	exists, err := db.UserExistsNotBanned(uid, requesting_uid)
@@ -120,7 +150,7 @@ func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_i
 		return ERR_NOT_FOUND, nil, nil
 	}
 
-	rows, err := db.c.Query(`SELECT "followed", "user"."name" FROM "follows", "users"
+	rows, err := db.c.Query(`SELECT "followed", "users"."name" FROM "follows", "users"
 							WHERE "follows"."followed" = "users"."uid"
 
 							AND "follows"."followed" NOT IN (
@@ -131,7 +161,7 @@ func (db *appdbimpl) GetUserFollowing(uid string, requesting_uid string, start_i
 
 							AND "follower" = ?
 							LIMIT ?
-							OFFSET ?`, uid, requesting_uid, offset, start_index)
+							OFFSET ?`, requesting_uid, uid, limit, start_index)
 
 	following, err := db.uidNameQuery(rows, err)
 

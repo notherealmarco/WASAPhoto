@@ -1,8 +1,9 @@
 import axios from "axios";
+import getCurrentSession from "./authentication";
 
 const instance = axios.create({
 	baseURL: __API_URL__,
-	timeout: 1000 * 5
+	timeout: 1000 * 60
 });
 
 //axios.interceptors.request.use(function (config) {
@@ -13,7 +14,7 @@ const instance = axios.create({
 //});
 
 const updateToken = () => {
-	instance.defaults.headers.common['Authorization'] = 'Bearer ' + sessionStorage.getItem('token');
+	instance.defaults.headers.common['Authorization'] = 'Bearer ' + getCurrentSession();
 }
 
 export {

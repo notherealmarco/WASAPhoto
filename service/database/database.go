@@ -79,8 +79,11 @@ type AppDatabase interface {
 	Ping() error
 }
 
+// DBTransaction is the interface for a generic database transaction
 type DBTransaction interface {
+	// Commit commits the transaction
 	Commit() error
+	// Rollback rolls back the transaction
 	Rollback() error
 }
 
@@ -95,16 +98,17 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	// Check if tables exist. If not, the database is empty, and we need to create the structure
+	// Check if some table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	//todo: check for all the tables, not just users
+
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
+		// Database is empty, let's create the structure
 		sqlStmt := `CREATE TABLE "users" (
 			"uid"	TEXT NOT NULL,
 			"name"	TEXT NOT NULL UNIQUE,
 			PRIMARY KEY("uid")
-		)` // todo: one query is enough! We are we doing a query per table?
+		)`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)

@@ -103,6 +103,7 @@ func (db *appdbimpl) GetComments(uid string, photo_id int64, requesting_uid stri
 									AND "bans"."ban" = ?
 								)
 								AND "u"."uid" = "c"."user"
+								ORDER BY "c"."date" DESC
 								LIMIT ?
 								OFFSET ?`, photo_id, requesting_uid, limit, start_index)
 
